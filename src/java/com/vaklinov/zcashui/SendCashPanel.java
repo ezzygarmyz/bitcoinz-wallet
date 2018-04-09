@@ -741,7 +741,7 @@ public class SendCashPanel
 		    	// Open block explorer
 				Log.info("Transaction ID for block explorer is: " + TXID);
 				// TODO: code duplication with transactions table
-				String urlPrefix = "https://explorer.mybtczwallet.org/tx/";
+				String urlPrefix = "https://explorer.btcz.rocks/tx/";
 				if (installationObserver.isOnTestNet())
 				{
 					urlPrefix = "https://explorer-testnet.zen-solutions.io/tx/";
