@@ -108,7 +108,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("BitcoinZ Wallet 1.2.0");
+        super("BitcoinZ Wallet 1.2.1");
         
         if (progressDialog != null)
         {
