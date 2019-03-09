@@ -935,10 +935,10 @@ public class ZCashClientCaller
 	{
 		String first_letter = key.substring(0, 1);
 		
-		// T keys start with "L"
-		// Z keys start with "S"
+		// T keys start with "L" or "K"
+		// Z keys start with "S" or "s"
 		
-		if (first_letter.equals("S"))
+		if (first_letter.equals("S") || first_letter.equals("s"))
 		{
 			// Try a Z key
 			String[] params = new String[] 
@@ -997,7 +997,7 @@ public class ZCashClientCaller
 				throw new WalletCallException("Unexpected response from wallet: " + strResult);
 			}
 		}
-		else if (first_letter.equals("L"))
+		else if (first_letter.equals("L") || first_letter.equals("K"))
 		{
 			// try a T key
 			String strResult = this.executeCommandAndGetSingleStringResponse(
