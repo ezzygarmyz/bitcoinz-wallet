@@ -101,20 +101,20 @@ public class ZCashUI
     private SendCashPanel    sendPanel;
     private AddressBookPanel addressBookPanel;
     private MessagingPanel   messagingPanel;
-    
+
     JTabbedPane tabs;
     public static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~`!@#$%^&*()-_=+[{]}\\|;:\'\",<.>/?";
 
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("BitcoinZ Wallet 1.4.0");
-        
+        super("BitcoinZ Wallet 1.4.1");
+
         if (progressDialog != null)
         {
         	progressDialog.setProgressText("Starting GUI wallet...");
         }
-        
+
         ClassLoader cl = this.getClass().getClassLoader();
 
         this.setIconImage(new ImageIcon(cl.getResource("images/BitcoinZ.png")).getImage());
@@ -124,7 +124,7 @@ public class ZCashUI
         errorReporter = new StatusUpdateErrorReporter(this);
         installationObserver = new ZCashInstallationObserver(OSUtil.getProgramDirectory());
         clientCaller = new ZCashClientCaller(OSUtil.getProgramDirectory());
-        
+
         if (installationObserver.isOnTestNet())
         {
         	this.setTitle(this.getTitle() + " [using TESTNET]");
@@ -204,9 +204,9 @@ public class ZCashUI
         JMenu messaging = new JMenu("Messaging");
         messaging.setMnemonic(KeyEvent.VK_S);
         messaging.add(menuItemOwnIdentity = new JMenuItem("Own identity...", KeyEvent.VK_D));
-        menuItemOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));        
+        menuItemOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, accelaratorKeyMask));
         messaging.add(menuItemExportOwnIdentity = new JMenuItem("Export own identity...", KeyEvent.VK_X));
-        menuItemExportOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, accelaratorKeyMask));        
+        menuItemExportOwnIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, accelaratorKeyMask));
         messaging.add(menuItemAddMessagingGroup = new JMenuItem("Add messaging group...", KeyEvent.VK_G));
         menuItemAddMessagingGroup.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, accelaratorKeyMask));
         messaging.add(menuItemImportContactIdentity = new JMenuItem("Import contact identity...", KeyEvent.VK_Y));
@@ -215,7 +215,7 @@ public class ZCashUI
         menuItemRemoveContactIdentity.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, accelaratorKeyMask));
         messaging.add(menuItemMessagingOptions = new JMenuItem("Options...", KeyEvent.VK_O));
         menuItemMessagingOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, accelaratorKeyMask));
-        
+
         JMenu shareFileVia = new JMenu("Share file via:");
         shareFileVia.setMnemonic(KeyEvent.VK_V);
         // TODO: uncomment this for IPFS integration
@@ -227,7 +227,7 @@ public class ZCashUI
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
         //menuItemEncrypt.setEnabled(false);
-                        
+
         this.setJMenuBar(mb);
 
         // Add listeners etc.
@@ -261,7 +261,7 @@ public class ZCashUI
             }
         );
 
-        menuItemBackup.addActionListener(   
+        menuItemBackup.addActionListener(
         	new ActionListener()
             {
                 @Override
@@ -271,7 +271,7 @@ public class ZCashUI
                 }
             }
         );
-        
+
 //        menuItemEncrypt.addActionListener(
 //            new ActionListener()
 //            {
@@ -283,7 +283,7 @@ public class ZCashUI
 //            }
 //        );
 
-        menuItemExportKeys.addActionListener(   
+        menuItemExportKeys.addActionListener(
             new ActionListener()
             {
                 @Override
@@ -293,8 +293,8 @@ public class ZCashUI
                 }
             }
        );
-        
-       menuItemImportKeys.addActionListener(   
+
+       menuItemImportKeys.addActionListener(
             new ActionListener()
             {
                 @Override
@@ -304,8 +304,8 @@ public class ZCashUI
                 }
             }
        );
-       
-       menuItemShowPrivateKey.addActionListener(   
+
+       menuItemShowPrivateKey.addActionListener(
             new ActionListener()
             {
                 @Override
@@ -315,8 +315,8 @@ public class ZCashUI
                 }
             }
        );
-       
-       menuItemImportOnePrivateKey.addActionListener(   
+
+       menuItemImportOnePrivateKey.addActionListener(
            new ActionListener()
            {
                @Override
@@ -336,7 +336,7 @@ public class ZCashUI
                }
        );
 
-       menuItemOwnIdentity.addActionListener(   
+       menuItemOwnIdentity.addActionListener(
                new ActionListener()
                {
                    @Override
@@ -346,8 +346,8 @@ public class ZCashUI
                    }
                }
         );
-       
-       menuItemExportOwnIdentity.addActionListener(   
+
+       menuItemExportOwnIdentity.addActionListener(
                new ActionListener()
                {
                    @Override
@@ -358,7 +358,7 @@ public class ZCashUI
                }
         );
 
-       menuItemImportContactIdentity.addActionListener(   
+       menuItemImportContactIdentity.addActionListener(
                new ActionListener()
                {
                    @Override
@@ -461,19 +461,19 @@ public class ZCashUI
                     "Disclaimer", JOptionPane.INFORMATION_MESSAGE);
             }
         });
-        
+
         // Finally dispose of the progress dialog
         if (progressDialog != null)
         {
         	progressDialog.doDispose();
         }
-        
+
         // Notify the messaging TAB that it is being selected - every time
         tabs.addChangeListener(
-            new ChangeListener() 
-            {	
+            new ChangeListener()
+            {
     			@Override
-    			public void stateChanged(ChangeEvent e) 
+    			public void stateChanged(ChangeEvent e)
     			{
     				JTabbedPane tabs = (JTabbedPane)e.getSource();
     				if (tabs.getSelectedIndex() == 4)
@@ -483,7 +483,7 @@ public class ZCashUI
     			}
     		}
         );
-  
+
     }
 
     public void exitProgram()
@@ -491,12 +491,12 @@ public class ZCashUI
     	Log.info("Exiting ...");
 
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        
+
         this.dashboard.stopThreadsAndTimers();
         this.addresses.stopThreadsAndTimers();
         this.sendPanel.stopThreadsAndTimers();
         this.messagingPanel.stopThreadsAndTimers();
-        
+
         ZCashUI.this.setVisible(false);
         ZCashUI.this.dispose();
 
@@ -509,12 +509,12 @@ public class ZCashUI
         try
         {
         	OS_TYPE os = OSUtil.getOSType();
-        	
+
         	if ((os == OS_TYPE.WINDOWS) || (os == OS_TYPE.MAC_OS))
         	{
         		possiblyCreateZENConfigFile();
         	}
-        	
+
         	Log.info("Starting BitcoinZ Wallet ...");
         	Log.info("OS: " + System.getProperty("os.name") + " = " + os);
         	Log.info("Current directory: " + new File(".").getCanonicalPath());
@@ -526,7 +526,7 @@ public class ZCashUI
             {
             	// Custom Windows L&F and font settings
             	UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            	
+
             	// This font looks good but on Windows 7 it misses some chars like the stars...
             	//FontUIResource font = new FontUIResource("Lucida Sans Unicode", Font.PLAIN, 11);
             	//UIManager.put("Table.font", font);
@@ -536,7 +536,7 @@ public class ZCashUI
             	System.setProperty("apple.laf.useScreenMenuBar", "true");
             }
             else
-            {            
+            {
 	            for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels())
 	            {
 	            	Log.info("Available look and feel: " + ui.getName() + " " + ui.getClassName());
@@ -548,14 +548,14 @@ public class ZCashUI
 	                };
 	            }
             }
-            
+
             // If zcashd is currently not running, do a startup of the daemon as a child process
             // It may be started but not ready - then also show dialog
-            ZCashInstallationObserver initialInstallationObserver = 
+            ZCashInstallationObserver initialInstallationObserver =
             	new ZCashInstallationObserver(OSUtil.getProgramDirectory());
             DaemonInfo zcashdInfo = initialInstallationObserver.getDaemonInfo();
             initialInstallationObserver = null;
-            
+
             ZCashClientCaller initialClientCaller = new ZCashClientCaller(OSUtil.getProgramDirectory());
             boolean daemonStartInProgress = false;
             try
@@ -566,7 +566,7 @@ public class ZCashUI
             		// If more than 20 minutes behind in the blockchain - startup in progress
             		if ((System.currentTimeMillis() - info.lastBlockDate.getTime()) > (20 * 60 * 1000))
             		{
-            			Log.info("Current blockchain synchronization date is "  + 
+            			Log.info("Current blockchain synchronization date is "  +
             		                       new Date(info.lastBlockDate.getTime()));
             			daemonStartInProgress = true;
             		}
@@ -580,7 +580,7 @@ public class ZCashUI
                 	daemonStartInProgress = true;
                 }
             }
-            
+
             StartupProgressDialog startupBar = null;
             if ((zcashdInfo.status != DAEMON_STATUS.RUNNING) || (daemonStartInProgress))
             {
@@ -591,7 +591,7 @@ public class ZCashUI
 	            startupBar.waitForStartup();
             }
             initialClientCaller = null;
-            
+
             // Main GUI is created here
             ZCashUI ui = new ZCashUI(startupBar);
             ui.setVisible(true);
@@ -665,13 +665,13 @@ public class ZCashUI
                 .forEach(i -> pass.append(Character.toString(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())))));
         return pass.toString();
     }
-    
+
      public static void possiblyCreateZENConfigFile()
         throws IOException
     {
     	String blockchainDir = OSUtil.getBlockchainDirectory();
     	File dir = new File(blockchainDir);
-    	
+
 		if (!dir.exists())
 		{
 			if (!dir.mkdirs())
@@ -680,18 +680,18 @@ public class ZCashUI
 				throw new IOException("Could not create settings directory: " + dir.getCanonicalPath());
 			}
 		}
-		
+
 		File zenConfigFile = new File(dir, "bitcoinz.conf");
-		
+
 		if (!zenConfigFile.exists())
 		{
 			Log.info("BitcoinZ configuration file " + zenConfigFile.getCanonicalPath() +
 					 " does not exist. It will be created with default settings.");
-			
+
 			Random random = new SecureRandom();
-			
+
 			PrintStream configOut = new PrintStream(new FileOutputStream(zenConfigFile));
-			
+
 			configOut.println("#############################################################################");
 			configOut.println("#                         BitcoinZ configuration file                            #");
 			configOut.println("#############################################################################");
@@ -709,5 +709,5 @@ public class ZCashUI
 			configOut.close();
 		}
     }
-    
+
 }
