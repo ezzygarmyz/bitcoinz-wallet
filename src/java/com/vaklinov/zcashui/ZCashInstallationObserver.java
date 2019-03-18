@@ -63,7 +63,7 @@ public class ZCashInstallationObserver
 	}
 
 	private String args[];
-	
+
 	private Boolean isOnTestNet = null;
 
 	public ZCashInstallationObserver(String installDir)
@@ -89,8 +89,8 @@ public class ZCashInstallationObserver
 		}
 
 		Log.info("Using BitcoinZ utilities: " +
-		                   "zcashd: "    + ((zcashd != null) ? zcashd.getCanonicalPath() : "<MISSING>") + ", " +
-		                   "zcash-cli: " + ((zcashcli != null) ? zcashcli.getCanonicalPath() : "<MISSING>"));
+		                   "bitcoinzd: "    + ((zcashd != null) ? zcashd.getCanonicalPath() : "<MISSING>") + ", " +
+		                   "bitcoinz-cli: " + ((zcashcli != null) ? zcashcli.getCanonicalPath() : "<MISSING>"));
 
 		if ((zcashd == null) || (zcashcli == null) || (!zcashd.exists()) || (!zcashcli.exists()))
 		{
@@ -102,12 +102,12 @@ public class ZCashInstallationObserver
 		}
 	}
 
-	
+
 	public synchronized DaemonInfo getDaemonInfo()
 			throws IOException, InterruptedException
 	{
 		OS_TYPE os = OSUtil.getOSType();
-		
+
 		if (os == OS_TYPE.WINDOWS)
 		{
 			return getDaemonInfoForWindowsOS();
@@ -198,7 +198,7 @@ public class ZCashInstallationObserver
 	private synchronized DaemonInfo getDaemonInfoForWindowsOS()
 		throws IOException, InterruptedException
 	{
-		return getDaemonInfoForWindowsOS("zcashd");
+		return getDaemonInfoForWindowsOS("bitcoinzd");
 	}
 
 	public static synchronized DaemonInfo getDaemonInfoForWindowsOS(String daemonName)
@@ -228,12 +228,12 @@ public class ZCashInstallationObserver
 				{
 					break;
 				}
-				
+
 				if (token.startsWith("\""))
 				{
 					token = token.substring(1);
 				}
-				
+
 				if (token.endsWith("\""))
 				{
 					token = token.substring(0, token.length() - 1);
@@ -241,7 +241,7 @@ public class ZCashInstallationObserver
 
 				if (i == 0)
 				{
-					if (token.equals("zcashd.exe") || token.equals("zcashd"))
+					if (token.equals("bitcoinzd.exe") || token.equals("bitcoinzd"))
 					{
 						info.status = DAEMON_STATUS.RUNNING;
 						foundZCash = true;
@@ -257,7 +257,7 @@ public class ZCashInstallationObserver
 							size = size.substring(0, size.length() - 1);
 						}
 					} catch (NumberFormatException nfe) { /* TODO: Log or handle exception */ };
-				} 
+				}
 			} // End parsing row
 
 			if (foundZCash)
@@ -270,7 +270,7 @@ public class ZCashInstallationObserver
 					info.residentSizeMB = 0;
 					Log.error("Error: could not find the numeric memory size of " + daemonName + ": " + size);
 				};
-				
+
 				break;
 			}
 		}
@@ -284,9 +284,9 @@ public class ZCashInstallationObserver
 
 		return info;
 	}
-	
-	
-	
+
+
+
 	public boolean isOnTestNet()
 		throws IOException
 	{
@@ -294,7 +294,7 @@ public class ZCashInstallationObserver
 		{
 			return this.isOnTestNet.booleanValue();
 		}
-		
+
 		String blockChainDir = OSUtil.getBlockchainDirectory();
 		File zenConf = new File(blockChainDir + File.separator + "bitcoinz.conf");
 		if (zenConf.exists())
@@ -306,9 +306,9 @@ public class ZCashInstallationObserver
 				fis = new FileInputStream(zenConf);
 				confProps.load(fis);
 				String testNetStr = confProps.getProperty("testnet");
-				
+
 				this.isOnTestNet = (testNetStr != null) && (testNetStr.trim().equalsIgnoreCase("1"));
-				
+
 				return this.isOnTestNet.booleanValue();
 			} finally
 			{
@@ -323,7 +323,7 @@ public class ZCashInstallationObserver
 			return false;
 		}
 	}
-	
+
 
 	public static class InstallationDetectionException
 		extends IOException

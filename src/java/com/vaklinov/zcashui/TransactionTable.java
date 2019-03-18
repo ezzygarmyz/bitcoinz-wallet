@@ -64,24 +64,24 @@ import javax.swing.border.EtchedBorder;
  *
  * @author Ivan Vaklinov <ivan@vaklinov.com>
  */
-public class TransactionTable 
-	extends DataTable 
-{	
-	public TransactionTable(final Object[][] rowData, final Object[] columnNames, 
+public class TransactionTable
+	extends DataTable
+{
+	public TransactionTable(final Object[][] rowData, final Object[] columnNames,
 			                final JFrame parent, final ZCashClientCaller caller,
 			                final ZCashInstallationObserver installationObserver)
 	{
 		super(rowData, columnNames);
 		int accelaratorKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-		
+
 		JMenuItem showDetails = new JMenuItem("Show details...");
 		showDetails.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, accelaratorKeyMask));
         popupMenu.add(showDetails);
-        
-        showDetails.addActionListener(new ActionListener() 
-        {	
+
+        showDetails.addActionListener(new ActionListener()
+        {
 			@Override
-			public void actionPerformed(ActionEvent e) 
+			public void actionPerformed(ActionEvent e)
 			{
 				if ((lastRow >= 0) && (lastColumn >= 0))
 				{
@@ -89,11 +89,11 @@ public class TransactionTable
 					{
 						String txID = TransactionTable.this.getModel().getValueAt(lastRow, 6).toString();
 						txID = txID.replaceAll("\"", ""); // In case it has quotes
-						
+
 						Log.info("Transaction ID for detail dialog is: " + txID);
 						Map<String, String> details = caller.getRawTransactionDetails(txID);
 						String rawTrans = caller.getRawTransaction(txID);
-						
+
 						DetailsDialog dd = new DetailsDialog(parent, details);
 						dd.setVisible(true);
 					} catch (Exception ex)
@@ -107,16 +107,16 @@ public class TransactionTable
 				}
 			}
 		});
-        
-        
+
+
 		JMenuItem showInExplorer = new JMenuItem("Show in block explorer");
 		showInExplorer.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, accelaratorKeyMask));
         popupMenu.add(showInExplorer);
-        
-        showInExplorer.addActionListener(new ActionListener() 
-        {	
+
+        showInExplorer.addActionListener(new ActionListener()
+        {
 			@Override
-			public void actionPerformed(ActionEvent e) 
+			public void actionPerformed(ActionEvent e)
 			{
 				if ((lastRow >= 0) && (lastColumn >= 0))
 				{
@@ -124,15 +124,15 @@ public class TransactionTable
 					{
 						String txID = TransactionTable.this.getModel().getValueAt(lastRow, 6).toString();
 						txID = txID.replaceAll("\"", ""); // In case it has quotes
-						
+
 						Log.info("Transaction ID for block explorer is: " + txID);
 						// https://explorer.zcha.in/transactions/<ID>
 						String urlPrefix = "https://explorer.btcz.rocks/tx/";
 						if (installationObserver.isOnTestNet())
 						{
-							urlPrefix = "https://na";
+							urlPrefix = "http://testnet.explorer.btcz.life:3002/tx/";
 						}
-						
+
 						Desktop.getDesktop().browse(new URL(urlPrefix + txID).toURI());
 					} catch (Exception ex)
 					{
@@ -145,15 +145,15 @@ public class TransactionTable
 				}
 			}
 		});
-		
+
         JMenuItem showMemoField = new JMenuItem("Get transaction memo");
         showMemoField.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, accelaratorKeyMask));
 	    popupMenu.add(showMemoField);
-    
-        showMemoField.addActionListener(new ActionListener() 
-        {	
+
+        showMemoField.addActionListener(new ActionListener()
+        {
 			@Override
-			public void actionPerformed(ActionEvent e) 
+			public void actionPerformed(ActionEvent e)
 			{
 				if ((lastRow >= 0) && (lastColumn >= 0))
 				{
@@ -162,10 +162,10 @@ public class TransactionTable
 					{
 						String txID = TransactionTable.this.getModel().getValueAt(lastRow, 6).toString();
 						txID = txID.replaceAll("\"", ""); // In case it has quotes
-						
+
 						String acc = TransactionTable.this.getModel().getValueAt(lastRow, 5).toString();
 						acc = acc.replaceAll("\"", ""); // In case it has quotes
-						
+
 						boolean isZAddress = Util.isZAddress(acc);
 						if (!isZAddress)
 						{
@@ -178,8 +178,8 @@ public class TransactionTable
 						            JOptionPane.ERROR_MESSAGE);
 						    return;
 						}
-						
-						
+
+
 						Log.info("Transaction ID for Memo field is: " + txID);
 						Log.info("Account for Memo field is: " + acc);
 						parent.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -187,18 +187,18 @@ public class TransactionTable
  						String MemoField = caller.getMemoField(acc, txID);
  						parent.setCursor(oldCursor);
  						Log.info("Memo field is: " + MemoField);
- 						
+
  						if (MemoField != null)
  						{
  							Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
  							clipboard.setContents(new StringSelection(MemoField), null);
- 							
+
  							MemoField = Util.blockWrapString(MemoField, 80);
  							JOptionPane.showMessageDialog(
- 								parent, 
+ 								parent,
  								"The memo contained in the transaction is: \n" + MemoField +
  								"\n\n" +
- 								"(The memo has also been copied to the clipboard.)",  
+ 								"(The memo has also been copied to the clipboard.)",
  								"Memo", JOptionPane.PLAIN_MESSAGE);
  						} else
  						{
@@ -220,12 +220,12 @@ public class TransactionTable
 				}
 			}
         });
-		
+
 	} // End constructor
 
 
-	
-	
+
+
 	private static class DetailsDialog
 		extends JDialog
 	{
@@ -238,9 +238,9 @@ public class TransactionTable
 			this.setLocationRelativeTo(parent);
 			this.setModal(true);
 			this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-			
+
 			this.getContentPane().setLayout(new BorderLayout(0, 0));
-			
+
 			JPanel tempPanel = new JPanel(new BorderLayout(0, 0));
 			tempPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 			JLabel infoLabel = new JLabel(
@@ -251,7 +251,7 @@ public class TransactionTable
 			infoLabel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 			tempPanel.add(infoLabel, BorderLayout.CENTER);
 			this.getContentPane().add(tempPanel, BorderLayout.NORTH);
-			
+
 			String[] columns = new String[] { "Name", "Value" };
 			String[][] data = new String[details.size()][2];
 			int i = 0;
@@ -262,13 +262,13 @@ public class TransactionTable
 				{
 					maxPreferredWidht = ent.getValue().length() * 6;
 				}
-				
+
 				data[i][0] = ent.getKey();
 				data[i][1] = ent.getValue();
 				i++;
 			}
-			
-			Arrays.sort(data, new Comparator<String[]>() 
+
+			Arrays.sort(data, new Comparator<String[]>()
 			{
 			    public int compare(String[] o1, String[] o2)
 			    {
@@ -280,14 +280,14 @@ public class TransactionTable
 			    	return false;
 			    }
 			});
-			
+
 			DataTable table = new DataTable(data, columns);
 			table.getColumnModel().getColumn(0).setPreferredWidth(200);
 			table.getColumnModel().getColumn(1).setPreferredWidth(maxPreferredWidht);
 			table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 			JScrollPane tablePane = new JScrollPane(
 				table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			
+
 			this.getContentPane().add(tablePane, BorderLayout.CENTER);
 
 			// Lower close button
@@ -308,7 +308,7 @@ public class TransactionTable
 			});
 
 		}
-		
-		
+
+
 	}
 }
