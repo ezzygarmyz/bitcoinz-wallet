@@ -66,24 +66,24 @@ public class Util
 		{
 			return true;
 		}
-		
+
 		if (ar1.length != ar2.length)
 		{
 			return true;
 		}
-		
+
 		for (int i = 0; i < ar1.length; i++)
 		{
 			if (ar1[i].length != ar2[i].length)
 			{
 				return true;
 			}
-			
+
 			for (int j = 0; j < ar1[i].length; j++)
 			{
 				String s1 = ar1[i][j];
 				String s2 = ar2[i][j];
-				
+
 				if (s1 == null)
 				{
 					if (s2 != null)
@@ -102,18 +102,18 @@ public class Util
 				}
 			}
 		}
-		
+
 		return false;
 	}
-	
-	
+
+
 	// Turns a 1.0.7+ error message to a an old JSOn style message
 	// info - new style error message
 	public static JsonObject getJsonErrorMessage(String info)
 	    throws IOException
 	{
     	JsonObject jInfo = new JsonObject();
-    	
+
     	// Error message here comes from ZCash 1.0.7+ and is like:
     	//zcash-cli getinfo
     	//error code: -28
@@ -124,44 +124,44 @@ public class Util
     	jInfo.set("code", errCode);
     	lnr.readLine();
     	jInfo.set("message", lnr.readLine().trim());
-    	
+
     	return jInfo;
 	}
-	
-	
+
+
 	/**
 	 * Escapes a text value to a form suitable to be displayed in HTML content. Important control
 	 * characters are replaced with entities.
-	 * 
+	 *
 	 * @param inputValue th value to escape
-	 * 
+	 *
 	 * @return the "safe" value to display.
 	 */
-	public static String escapeHTMLValue(String inputValue) 
+	public static String escapeHTMLValue(String inputValue)
 	{
 	    StringBuilder outputValue = new StringBuilder();
-	    for (char c : inputValue.toCharArray()) 
+	    for (char c : inputValue.toCharArray())
 	    {
-	        if ((c > 127) || (c == '"') || (c == '<') || (c == '>') || (c == '&')) 
+	        if ((c > 127) || (c == '"') || (c == '<') || (c == '>') || (c == '&'))
 	        {
 	            outputValue.append("&#");
 	            outputValue.append((int)c);
 	            outputValue.append(';');
-	        } else 
+	        } else
 	        {
 	            outputValue.append(c);
 	        }
 	    }
 	    return outputValue.toString();
 	}
-	
-	
+
+
 	public static boolean stringIsEmpty(String s)
 	{
 		return (s == null) || (s.length() <= 0);
 	}
-	
-	
+
+
 	public static String decodeHexMemo(String memoHex)
 		throws UnsupportedEncodingException
 	{
@@ -170,17 +170,17 @@ public class Util
         {
         	return null;
         }
-        
+
         // should be read with UTF-8
         byte[] bytes = new byte[(memoHex.length() / 2) + 1];
         int count = 0;
-        
+
         for (int j = 0; j < memoHex.length(); j += 2)
         {
             String str = memoHex.substring(j, j + 2);
             bytes[count++] = (byte)Integer.parseInt(str, 16);
         }
-        
+
         // Remove zero padding
         // TODO: may cause problems if UNICODE chars have trailing ZEROS
         while (count > 0)
@@ -193,18 +193,18 @@ public class Util
         		break;
         	}
         }
-        
+
         return new String(bytes, 0, count, "UTF-8");
 	}
-	
-	
+
+
 	public static String encodeHexString(String str)
 		throws UnsupportedEncodingException
 	{
 		return encodeHexArray(str.getBytes("UTF-8"));
 	}
-	
-	
+
+
 	public static String encodeHexArray(byte array[])
 	{
 		StringBuilder encoded = new StringBuilder();
@@ -216,34 +216,34 @@ public class Util
 				hexByte = "0" + hexByte;
 			} else if (hexByte.length() > 2)
 			{
-				hexByte = hexByte.substring(hexByte.length() - 2, hexByte.length()); 
+				hexByte = hexByte.substring(hexByte.length() - 2, hexByte.length());
 			}
 			encoded.append(hexByte);
 		}
-		
+
 		return encoded.toString();
 	}
-	
-	
+
+
 	/**
 	 * Maintains a set of old copies for a file.
 	 * For a file dir/file, the old versions are dir/file.1, dir/file.2 etc. up to 9.
-	 * 
+	 *
 	 * @param dir base directory
-	 * 
+	 *
 	 * @param file name of the original file
 	 */
 	public static void renameFileForMultiVersionBackup(File dir, String file)
 	{
 		final int VERSION_COUNT = 9;
-		
+
 		// Delete last one if it exists
 		File last = new File(dir, file + "." + VERSION_COUNT);
 		if (last.exists())
 		{
 			last.delete();
 		}
-		
+
 		// Iterate and rename
 		for (int i = VERSION_COUNT - 1; i >= 1; i--)
 		{
@@ -254,7 +254,7 @@ public class Util
 				f.renameTo(new File(dir, file + "." + newIndex));
 			}
 		}
-		
+
 		// Rename last one
 		File orig = new File(dir, file);
 		if (orig.exists())
@@ -262,8 +262,8 @@ public class Util
 			orig.renameTo(new File(dir, file + ".1"));
 		}
 	}
-	
-	
+
+
 	public static JsonObject parseJsonObject(String json)
 		throws IOException
 	{
@@ -275,8 +275,8 @@ public class Util
 			throw new IOException(rte);
 		}
 	}
-	
-	
+
+
 	public static JsonObject parseJsonObject(Reader r)
 		throws IOException
 	{
@@ -289,11 +289,11 @@ public class Util
 		}
 	}
 
-	
+
 	public static byte[] calculateSHA256Digest(byte[] input)
-		throws IOException 
+		throws IOException
 	{
-        try 
+        try
         {
         	MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
         	DigestInputStream dis = new DigestInputStream(new ByteArrayInputStream(input), sha256);
@@ -303,38 +303,38 @@ public class Util
             {
             	digest = sha256.digest();
             }
-            
+
             return digest;
-        } catch (NoSuchAlgorithmException impossible) 
+        } catch (NoSuchAlgorithmException impossible)
         {
             throw new IOException(impossible);
         }
 	}
-	
-	
+
+
 	public static String convertGroupPhraseToZPrivateKey(String phrase)
 		throws IOException
 	{
 		byte phraseBytes[] = phrase.getBytes("UTF-8");
 		byte phraseDigest[] = calculateSHA256Digest(phraseBytes);
-		
+
 		phraseDigest[0] &= (byte)0x0f;
-		
+
 		//System.out.println(encodeHexArray(phraseDigest));
-		
+
 		byte base58Input[] = new byte[phraseDigest.length + 2];
 		base58Input[0] = (byte)0xab;
 		base58Input[1] = (byte)0x36;
 		System.arraycopy(phraseDigest, 0, base58Input, 2, phraseDigest.length);
-		
+
 		// Do a double SHA356 to get a checksum for the data to encode
 		byte shaStage1[] = calculateSHA256Digest(base58Input);
 		byte checksum[] = calculateSHA256Digest(shaStage1);
-		
+
 		byte base58CheckInput[] = new byte[base58Input.length + 4];
 		System.arraycopy(base58Input, 0, base58CheckInput, 0, base58Input.length);
 		System.arraycopy(checksum, 0, base58CheckInput, base58Input.length, 4);
-		
+
 		// Call BitcoinJ via reflection - and report error if missing
 		try
 		{
@@ -348,23 +348,23 @@ public class Util
 			    "Make sure the bitcoinj-core-0.14.5.jar is available!", e);
 		}
 	}
-	
-	
+
+
 	// zc/zt - mainnet and testnet
 	// TODO: We need a much more precise criterion to distinguish T/Z adresses;
 	public static boolean isZAddress(String address)
 	{
-		return (address != null) && 
-			   (address.startsWith("zc") || address.startsWith("zt")) && 
+		return (address != null) &&
+			   (address.startsWith("zc") || address.startsWith("zt") || address.startsWith("zs")) &&
 			   (address.length() > 40);
 	}
-	
-	
+
+
 	/**
 	 * Delets a directory and all of its subdirectories.
-	 * 
+	 *
 	 * @param dir directory to delete.
-	 * 
+	 *
 	 * @throws IOException if not successful
 	 */
 	public static void deleteDirectory(File dir)
@@ -383,26 +383,26 @@ public class Util
 				}
 			}
 		}
-		
+
 		if (!dir.delete())
 		{
 			throw new IOException("Could not delete directory: " + dir.getAbsolutePath());
 		}
 	}
-	
-	
+
+
 	/**
 	 * Wraps an input string in a block form with the specified width. LF is used to end each line.
-	 * 
+	 *
 	 * @param inStr
 	 * @param width
-	 * 
+	 *
 	 * @return input wrapped
 	 */
 	public static String blockWrapString(String inStr, int width)
 	{
 		StringBuilder block = new StringBuilder();
-		
+
 		int position = 0;
 		while (position < inStr.length())
 		{
@@ -411,11 +411,11 @@ public class Util
 			block.append("\n");
 			position += width;
 		}
-		
+
 		return block.toString();
 	}
-	
-	
+
+
 	public static byte[] loadFileInMemory(File f)
 		throws IOException
 	{
@@ -423,10 +423,10 @@ public class Util
 		try
 		{
 			oRAF = new RandomAccessFile(f, "r");
-			
+
 			byte bytes[] = new byte[(int)oRAF.length()];
 			oRAF.readFully(bytes);
-			
+
 			return bytes;
 		} finally
 		{
