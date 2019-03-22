@@ -369,7 +369,6 @@ public class SendCashPanel
 							} catch (Exception ex)
 							{
 								Log.error("Unexpected error", ex);
-								// TODO: clipboard exception handling - do it better
 								// java.awt.datatransfer.UnsupportedFlavorException: Unicode String
 								//SendCashPanel.this.errorReporter.reportError(ex);
 							}
@@ -390,7 +389,6 @@ public class SendCashPanel
 							} catch (Exception ex)
 							{
 								Log.error("Unexpected error", ex);
-								// TODO: clipboard exception handling - do it better
 								// java.awt.datatransfer.UnsupportedFlavorException: Unicode String
 								//SendCashPanel.this.errorReporter.reportError(ex);
 							}
