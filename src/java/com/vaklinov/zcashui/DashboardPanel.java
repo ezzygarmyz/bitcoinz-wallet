@@ -507,7 +507,7 @@ public class DashboardPanel
 		}
 
 		// Format double numbers - else sometimes we get exponential notation 1E-4 BTCZ
-		DecimalFormat df = new DecimalFormat("########0.00######");
+		DecimalFormat df = new DecimalFormat("######,##0.00######");
 
 		String transparentBalance = df.format(balance.transparentBalance);
 		String privateBalance = df.format(balance.privateBalance);
@@ -663,7 +663,7 @@ public class DashboardPanel
 			notConfirmed = " \u25B6";
 		}
 
-		DecimalFormat df = new DecimalFormat("########0.00######");
+		DecimalFormat df = new DecimalFormat("######,##0.00######");
 
 		// Change the direction and date etc. attributes for presentation purposes
 		for (String[] trans : allTransactions)

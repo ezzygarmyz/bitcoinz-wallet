@@ -42,10 +42,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.DecimalFormat;
+import java.math.RoundingMode;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -95,13 +99,15 @@ public class SendCashPanel
 
 	private JButton    sendButton              = null;
 
-	private JPanel       operationStatusPanel        = null;
-	private JLabel       operationStatusLabel        = null;
-	private JProgressBar operationStatusProhgressBar = null;
-	private Timer        operationStatusTimer        = null;
-	private String       operationStatusID           = null;
-	private int          operationStatusCounter      = 0;
-
+	private JPanel       operationStatusPanel        						= null;
+	private JLabel       operationStatusLabel        						= null;
+	private JProgressBar operationStatusProhgressBar 						= null;
+	private Timer        operationStatusTimer        						= null;
+	private String       operationStatusID           						= null;
+	private int          operationStatusCounter      						= 0;
+	private Timer 							destinationAmountFieldStart						 = null;
+ private int 									destinationAmountFieldWait							 = 3000;
+ private int 									destinationAmountFieldElapsed					= 0;
 
 	public SendCashPanel(ZCashClientCaller clientCaller,
 			             StatusUpdateErrorReporter errorReporter,
@@ -148,7 +154,7 @@ public class SendCashPanel
 
 		destinationAddressField = new JTextField(73);
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        tempPanel.add(destinationAddressField);
+  tempPanel.add(destinationAddressField);
 		sendCashPanel.add(tempPanel);
 
 		dividerLabel = new JLabel("   ");
@@ -177,7 +183,8 @@ public class SendCashPanel
 		JPanel amountPanel = new JPanel(new BorderLayout());
 		amountPanel.add(new JLabel("Amount to send:"), BorderLayout.NORTH);
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		tempPanel.add(destinationAmountField = new JTextField(13));
+		JTextField destinationAmountField = new JTextField(13);
+		tempPanel.add(destinationAmountField);
 		destinationAmountField.setHorizontalAlignment(SwingConstants.RIGHT);
 		tempPanel.add(new JLabel(" BTCZ    "));
 		amountPanel.add(tempPanel, BorderLayout.SOUTH);
@@ -342,6 +349,54 @@ public class SendCashPanel
 				}
 			}
 		});
+
+  destinationAmountFieldStart = new Timer(5000, new ActionListener()
+		{
+						@Override
+						public void actionPerformed(ActionEvent e)
+						{
+							try
+							{
+								 String text = destinationAmountField.getText();
+									if (text.length() > 0)
+									{
+										DecimalFormat df = new DecimalFormat("######,###.########");
+										df.setRoundingMode(RoundingMode.CEILING);
+										Number amount = df.parse(text);
+										String formatted = df.format(amount);
+										destinationAmountField.setText(formatted);
+									}
+
+							} catch (Exception ex)
+							{
+								Log.error("Unexpected error", ex);
+								// TODO: clipboard exception handling - do it better
+								// java.awt.datatransfer.UnsupportedFlavorException: Unicode String
+								//SendCashPanel.this.errorReporter.reportError(ex);
+							}
+						}
+   	});
+
+		destinationAmountField.addKeyListener(new KeyAdapter()
+		{
+
+						@Override
+						public void keyReleased(KeyEvent e)
+						{
+							try
+							{
+									destinationAmountFieldStart.restart();
+									destinationAmountFieldStart.start();
+
+							} catch (Exception ex)
+							{
+								Log.error("Unexpected error", ex);
+								// TODO: clipboard exception handling - do it better
+								// java.awt.datatransfer.UnsupportedFlavorException: Unicode String
+								//SendCashPanel.this.errorReporter.reportError(ex);
+							}
+						}
+   	});
 
         this.destinationAddressField.addMouseListener(new MouseAdapter()
         {
