@@ -183,8 +183,7 @@ public class SendCashPanel
 		JPanel amountPanel = new JPanel(new BorderLayout());
 		amountPanel.add(new JLabel("Amount to send:"), BorderLayout.NORTH);
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		JTextField destinationAmountField = new JTextField(13);
-		tempPanel.add(destinationAmountField);
+  tempPanel.add(destinationAmountField = new JTextField(13));
 		destinationAmountField.setHorizontalAlignment(SwingConstants.RIGHT);
 		tempPanel.add(new JLabel(" BTCZ    "));
 		amountPanel.add(tempPanel, BorderLayout.SOUTH);
@@ -447,7 +446,7 @@ public class SendCashPanel
 		final String sourceAddress = this.lastAddressBalanceData[this.balanceAddressCombo.getSelectedIndex()][1];
 		final String destinationAddress = this.destinationAddressField.getText();
 		final String memo = this.destinationMemoField.getText();
-		final String amount = this.destinationAmountField.getText();
+		final String amount = this.destinationAmountField.getText().replace(",", "");
 		final String fee = this.transactionFeeField.getText();
 
 		// Verify general correctness.
