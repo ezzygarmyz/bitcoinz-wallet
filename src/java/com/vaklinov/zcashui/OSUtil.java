@@ -99,7 +99,7 @@ public class OSUtil
 	}
 
 
-	// Returns the name of the zcashd server - may vary depending on the OS.
+	// Returns the name of the bitcoinzd server - may vary depending on the OS.
 	public static String getZCashd()
 	{
 		String zcashd = "bitcoinzd";

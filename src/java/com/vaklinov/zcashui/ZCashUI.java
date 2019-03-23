@@ -449,7 +449,7 @@ public class ZCashUI
                     ZCashUI.this.getRootPane().getParent(),
                     "The BitcoinZ GUI Wallet is currently considered experimental. Use of this software\n" +
                     "comes at your own risk! Be sure to read the list of known issues and limitations\n" +
-                    "at this page: https://github.com/bitcoinz-pod/bitcoinz-windows-wallet\n\n" +
+                    "at this page: https://github.com/btcz/bitcoinz-wallet\n\n" +
                     "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
                     "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
                     "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
@@ -549,7 +549,7 @@ public class ZCashUI
 	            }
             }
 
-            // If zcashd is currently not running, do a startup of the daemon as a child process
+            // If bitcoinzd is currently not running, do a startup of the daemon as a child process
             // It may be started but not ready - then also show dialog
             ZCashInstallationObserver initialInstallationObserver =
             	new ZCashInstallationObserver(OSUtil.getProgramDirectory());
@@ -701,7 +701,7 @@ public class ZCashUI
 			configOut.println("# Creation date: " + new Date().toString());
 			configOut.println("#############################################################################");
 			configOut.println("");
-			configOut.println("# The rpcuser/rpcpassword are used for the local call to zcashd");
+			configOut.println("# The rpcuser/rpcpassword are used for the local call to bitcoinzd");
 			configOut.println("rpcuser=User" + getPassword(random));
 			configOut.println("rpcpassword=Pass" + getPassword(random));
 			configOut.println("");

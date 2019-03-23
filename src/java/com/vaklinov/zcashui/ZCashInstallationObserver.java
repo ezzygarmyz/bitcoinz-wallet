@@ -96,7 +96,7 @@ public class ZCashInstallationObserver
 		{
 			throw new InstallationDetectionException(
 				"The BitcoinZ GUI Wallet installation directory " + installDir + " needs\nto contain " +
-				"the command line utilities zcashd and zcash-cli. At least one of them is missing! \n" +
+				"the command line utilities bitcoinzd and bitcoinz-cli. At least one of them is missing! \n" +
 				"Please place files BitcoinZWallet.jar, " + OSUtil.getZCashCli() + ", " +
 				OSUtil.getZCashd() + " in the same directory.");
 		}
@@ -121,7 +121,7 @@ public class ZCashInstallationObserver
 	private synchronized DaemonInfo getDaemonInfoForUNIXLikeOS()
 		throws IOException, InterruptedException
 	{
-		return getDaemonInfoForUNIXLikeOS("zcashd");
+		return getDaemonInfoForUNIXLikeOS("bitcoinzd");
 	}
 
 	// So far tested on Mac OS X and Linux - expected to work on other UNIXes as well
@@ -166,11 +166,11 @@ public class ZCashInstallationObserver
 				{
 					try
 					{
-					    info.residentSizeMB = Double.valueOf(token) / 1000;
+					 info.residentSizeMB = Double.valueOf(token) / 1000;
 					} catch (NumberFormatException nfe) { /* TODO: Log or handle exception */ };
 				} else if (i == 10)
 				{
-					if ((token.equals("zcashd")) || (token.endsWith("/zcashd")))
+					if ((token.equals("bitcoinzd")) || (token.endsWith("/bitcoinzd")))
 					{
 						info.status = DAEMON_STATUS.RUNNING;
 						foundZCash = true;
@@ -245,7 +245,7 @@ public class ZCashInstallationObserver
 					{
 						info.status = DAEMON_STATUS.RUNNING;
 						foundZCash = true;
-						//System.out.println("zcashd process data is: " + line);
+						//System.out.println("bitcoinzd process data is: " + line);
 					}
 				} else if ((i >= 4) && foundZCash)
 				{

@@ -61,6 +61,8 @@ import com.vaklinov.zcashui.OSUtil.OS_TYPE;
  */
 public class ZCashClientCaller
 {
+	private ZCashInstallationObserver installationObserver =	new ZCashInstallationObserver(OSUtil.getProgramDirectory());
+	private Boolean isTestnet = installationObserver.isOnTestNet();
 	public static class WalletBalance
 	{
 		public double transparentBalance;
@@ -115,7 +117,7 @@ public class ZCashClientCaller
 		{
 			throw new IOException(
 				"The BitcoinZ installation directory " + installDir + " needs to contain " +
-				"the command line utilities zcashd and zcash-cli. zcash-cli is missing!");
+				"the command line utilities bitcoinzd and bitcoinz-cli. zcash-cli is missing!");
 		}
 
 		zcashd = new File(dir, OSUtil.getZCashd());
@@ -128,7 +130,7 @@ public class ZCashClientCaller
 		{
 		    throw new IOException(
 		    	"The BitcoinZ command line utility " + zcashcli.getCanonicalPath() +
-		    	" was found, but zcashd was not found!");
+		    	" was found, but bitcoinzd was not found!");
 		}
 	}
 
@@ -935,8 +937,9 @@ public class ZCashClientCaller
 	{
 		String first_letter = key.substring(0, 1);
 
-		// T keys start with "L" or "K"
-		// Z keys start with "S" or "s"
+		// Mainnet T keys start with "L" or "K" or "5"
+		// Testnet T keys start with "c" or "9"
+		// Mainnet and Testnet Z keys start with "S" or "s"
 
 		if (first_letter.equals("S") || first_letter.equals("s"))
 		{
@@ -997,7 +1000,8 @@ public class ZCashClientCaller
 				throw new WalletCallException("Unexpected response from wallet: " + strResult);
 			}
 		}
-		else if (first_letter.equals("L") || first_letter.equals("K") || first_letter.equals("c")) //include "c" for TestNet
+		//include "9" and "c" for TestNet
+		else if (isTestnet == true ? first_letter.equals("9") || first_letter.equals("c") : first_letter.equals("5") || first_letter.equals("K") || first_letter.equals("L"))
 		{
 			// try a T key
 			String strResult = this.executeCommandAndGetSingleStringResponse(
@@ -1019,7 +1023,7 @@ public class ZCashClientCaller
 		}
 		else
 		{
-			throw new WalletCallException("Single private key should start with a 'L' or a 'S' !!!");
+			throw new WalletCallException(isTestnet == true ? "TestNet private key should start with a '9' or 'c'" : "Single private key should start with L, K, or 5");
 		}
 		throw new WalletCallException("Error while importing private key");
 	}
