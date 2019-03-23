@@ -108,7 +108,7 @@ public class ZCashUI
     public ZCashUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("BitcoinZ Wallet 1.4.1");
+        super("BitcoinZ Wallet 2.0.3");
 
         if (progressDialog != null)
         {
@@ -449,7 +449,7 @@ public class ZCashUI
                     ZCashUI.this.getRootPane().getParent(),
                     "The BitcoinZ GUI Wallet is currently considered experimental. Use of this software\n" +
                     "comes at your own risk! Be sure to read the list of known issues and limitations\n" +
-                    "at this page: https://github.com/bitcoinz-pod/bitcoinz-windows-wallet\n\n" +
+                    "at this page: https://github.com/btcz/bitcoinz-wallet\n\n" +
                     "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
                     "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
                     "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
@@ -549,7 +549,7 @@ public class ZCashUI
 	            }
             }
 
-            // If zcashd is currently not running, do a startup of the daemon as a child process
+            // If bitcoinzd is currently not running, do a startup of the daemon as a child process
             // It may be started but not ready - then also show dialog
             ZCashInstallationObserver initialInstallationObserver =
             	new ZCashInstallationObserver(OSUtil.getProgramDirectory());
@@ -576,7 +576,7 @@ public class ZCashUI
                 if ((wce.getMessage().indexOf("{\"code\":-28") != -1) || // Started but not ready
                 	(wce.getMessage().indexOf("error code: -28") != -1))
                 {
-                	Log.info("zcashd is currently starting...");
+                	Log.info("bitcoinzd is currently starting...");
                 	daemonStartInProgress = true;
                 }
             }
@@ -585,7 +585,7 @@ public class ZCashUI
             if ((zcashdInfo.status != DAEMON_STATUS.RUNNING) || (daemonStartInProgress))
             {
             	Log.info(
-            		"zcashd is not runing at the moment or has not started/synchronized 100% - showing splash...");
+            		"bitcoinzd is not runing at the moment or has not started/synchronized 100% - showing splash...");
 	            startupBar = new StartupProgressDialog(initialClientCaller);
 	            startupBar.setVisible(true);
 	            startupBar.waitForStartup();
@@ -616,7 +616,7 @@ public class ZCashUI
             {
                 JOptionPane.showMessageDialog(
                         null,
-                        "It appears that zcashd has been started but is not ready to accept wallet\n" +
+                        "It appears that bitcoinzd has been started but is not ready to accept wallet\n" +
                         "connections. It is still loading the wallet and blockchain. Please try to \n" +
                         "start the GUI wallet later...",
                         "Wallet communication error",
@@ -626,8 +626,8 @@ public class ZCashUI
                 JOptionPane.showMessageDialog(
                     null,
                     "There was a problem communicating with the BitcoinZ daemon/wallet. \n" +
-                    "Please ensure that the BitcoinZ server zcashd is started (e.g. via \n" +
-                    "command  \"zcashd --daemon\"). Error message is: \n" +
+                    "Please ensure that the BitcoinZ server bitcoinzd is started (e.g. via \n" +
+                    "command  \"bitcoinzd --daemon\"). Error message is: \n" +
                      wce.getMessage() +
                     "See the console/logfile output for more detailed error information!",
                     "Wallet communication error",
@@ -701,7 +701,7 @@ public class ZCashUI
 			configOut.println("# Creation date: " + new Date().toString());
 			configOut.println("#############################################################################");
 			configOut.println("");
-			configOut.println("# The rpcuser/rpcpassword are used for the local call to zcashd");
+			configOut.println("# The rpcuser/rpcpassword are used for the local call to bitcoinzd");
 			configOut.println("rpcuser=User" + getPassword(random));
 			configOut.println("rpcpassword=Pass" + getPassword(random));
 			configOut.println("");

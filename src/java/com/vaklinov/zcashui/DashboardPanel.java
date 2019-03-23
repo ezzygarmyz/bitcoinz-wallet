@@ -79,19 +79,19 @@ public class DashboardPanel
 
 	private Boolean walletIsEncrypted   = null;
 	private Integer blockchainPercentage = null;
-	
+
 	private String OSInfo              = null;
 	private JLabel daemonStatusLabel   = null;
 	private DataGatheringThread<DaemonInfo> daemonInfoGatheringThread = null;
-	
+
 	private JLabel walletBalanceLabel  = null;
 	private DataGatheringThread<WalletBalance> walletBalanceGatheringThread = null;
-	
+
 	private JTable transactionsTable   = null;
 	private JScrollPane transactionsTablePane  = null;
 	private String[][] lastTransactionsData = null;
 	private DataGatheringThread<String[][]> transactionGatheringThread = null;
-	
+
 
 	public DashboardPanel(JFrame parentFrame,
 			              ZCashInstallationObserver installationObserver,
@@ -117,9 +117,9 @@ public class DashboardPanel
 		// Upper panel with wallet balance
 		JPanel balanceStatusPanel = new JPanel();
 		// Use border layout to have balances to the left
-		balanceStatusPanel.setLayout(new BorderLayout(3, 3)); 
+		balanceStatusPanel.setLayout(new BorderLayout(3, 3));
 		//balanceStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		
+
 		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 9));
 		JLabel logoLabel = new JLabel(new ImageIcon(
 			this.getClass().getClassLoader().getResource("images/btz_icon.png")));
@@ -137,11 +137,11 @@ public class DashboardPanel
 		transactionHeadingLabel.setFont(new Font("Helvetica", Font.BOLD, 19));
 		tempPanel.add(transactionHeadingLabel);
 		balanceStatusPanel.add(tempPanel, BorderLayout.CENTER);
-						
+
 		PresentationPanel walletBalancePanel = new PresentationPanel();
 		walletBalancePanel.add(walletBalanceLabel = new JLabel());
 		balanceStatusPanel.add(walletBalancePanel, BorderLayout.EAST);
-		
+
 		dashboard.add(balanceStatusPanel, BorderLayout.NORTH);
 
 		// Table of transactions
@@ -157,16 +157,16 @@ public class DashboardPanel
 		PresentationPanel daemonStatusPanel = new PresentationPanel();
 		daemonStatusPanel.add(daemonStatusLabel = new JLabel());
 		installationStatusPanel.add(daemonStatusPanel, BorderLayout.WEST);
-		
+
 		PresentationPanel networkAndBlockchainPanel = new PresentationPanel();
 		networkAndBlockchainPanel.add(networkAndBlockchainLabel = new JLabel());
-		installationStatusPanel.add(networkAndBlockchainPanel, BorderLayout.EAST);		
-		
+		installationStatusPanel.add(networkAndBlockchainPanel, BorderLayout.EAST);
+
 		dashboard.add(installationStatusPanel, BorderLayout.SOUTH);
 
 		// Thread and timer to update the daemon status
 		this.daemonInfoGatheringThread = new DataGatheringThread<DaemonInfo>(
-			new DataGatheringThread.DataGatherer<DaemonInfo>() 
+			new DataGatheringThread.DataGatherer<DaemonInfo>()
 			{
 				public DaemonInfo gatherData()
 					throws Exception
@@ -175,13 +175,13 @@ public class DashboardPanel
 					DaemonInfo daemonInfo = DashboardPanel.this.installationObserver.getDaemonInfo();
 					long end = System.currentTimeMillis();
 					Log.info("Gathering of dashboard daemon status data done in " + (end - start) + "ms." );
-					
+
 					return daemonInfo;
 				}
-			}, 
+			},
 			this.errorReporter, 2000, true);
 		this.threads.add(this.daemonInfoGatheringThread);
-		
+
 		ActionListener alDeamonStatus = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e)
@@ -199,10 +199,10 @@ public class DashboardPanel
 		Timer t = new Timer(1000, alDeamonStatus);
 		t.start();
 		this.timers.add(t);
-		
+
 		// Thread and timer to update the wallet balance
 		this.walletBalanceGatheringThread = new DataGatheringThread<WalletBalance>(
-			new DataGatheringThread.DataGatherer<WalletBalance>() 
+			new DataGatheringThread.DataGatherer<WalletBalance>()
 			{
 				public WalletBalance gatherData()
 					throws Exception
@@ -210,22 +210,22 @@ public class DashboardPanel
 					long start = System.currentTimeMillis();
 					WalletBalance balance = DashboardPanel.this.clientCaller.getWalletInfo();
 					long end = System.currentTimeMillis();
-					
+
 					// TODO: move this call to a dedicated one-off gathering thread - this is the wrong place
 					// it works but a better design is needed.
 					if (DashboardPanel.this.walletIsEncrypted == null)
 					{
 					    DashboardPanel.this.walletIsEncrypted = DashboardPanel.this.clientCaller.isWalletEncrypted();
 					}
-					
+
 					Log.info("Gathering of dashboard wallet balance data done in " + (end - start) + "ms." );
-					
+
 					return balance;
 				}
-			}, 
+			},
 			this.errorReporter, 8000, true);
 		this.threads.add(this.walletBalanceGatheringThread);
-		
+
 		ActionListener alWalletBalance = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e)
@@ -247,7 +247,7 @@ public class DashboardPanel
 
 		// Thread and timer to update the transactions table
 		this.transactionGatheringThread = new DataGatheringThread<String[][]>(
-			new DataGatheringThread.DataGatherer<String[][]>() 
+			new DataGatheringThread.DataGatherer<String[][]>()
 			{
 				public String[][] gatherData()
 					throws Exception
@@ -256,19 +256,19 @@ public class DashboardPanel
 					String[][] data =  DashboardPanel.this.getTransactionsDataFromWallet();
 					long end = System.currentTimeMillis();
 					Log.info("Gathering of dashboard wallet transactions table data done in " + (end - start) + "ms." );
-					
+
 					return data;
 				}
-			}, 
+			},
 			this.errorReporter, 20000);
 		this.threads.add(this.transactionGatheringThread);
-		
+
 		ActionListener alTransactions = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				try
-				{					
+				{
 					DashboardPanel.this.updateWalletTransactionsTable();
 				} catch (Exception ex)
 				{
@@ -283,7 +283,7 @@ public class DashboardPanel
 
 		// Thread and timer to update the network and blockchain details
 		this.netInfoGatheringThread = new DataGatheringThread<NetworkAndBlockchainInfo>(
-			new DataGatheringThread.DataGatherer<NetworkAndBlockchainInfo>() 
+			new DataGatheringThread.DataGatherer<NetworkAndBlockchainInfo>()
 			{
 				public NetworkAndBlockchainInfo gatherData()
 					throws Exception
@@ -292,13 +292,13 @@ public class DashboardPanel
 					NetworkAndBlockchainInfo data =  DashboardPanel.this.clientCaller.getNetworkAndBlockchainInfo();
 					long end = System.currentTimeMillis();
 					Log.info("Gathering of network and blockchain info data done in " + (end - start) + "ms." );
-					
+
 					return data;
 				}
-			}, 
+			},
 			this.errorReporter, 10000, true);
 		this.threads.add(this.netInfoGatheringThread);
-		
+
 		ActionListener alNetAndBlockchain = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e)
@@ -318,47 +318,47 @@ public class DashboardPanel
 		netAndBlockchainTimer.start();
 		this.timers.add(netAndBlockchainTimer);
 	}
-	
-	
+
+
 	// May be null!
 	public Integer getBlockchainPercentage()
 	{
 		return this.blockchainPercentage;
 	}
-	
+
 
 	private void updateDaemonStatusLabel()
 		throws IOException, InterruptedException, WalletCallException
 	{
 		DaemonInfo daemonInfo = this.daemonInfoGatheringThread.getLastData();
-		
+
 		// It is possible there has been no gathering initially
 		if (daemonInfo == null)
 		{
 			return;
 		}
-		
+
 		String daemonStatus = "<span style=\"color:green;font-weight:bold\">RUNNING</span>";
 		if (daemonInfo.status != DAEMON_STATUS.RUNNING)
 		{
 			daemonStatus = "<span style=\"color:red;font-weight:bold\">NOT RUNNING</span>";
 		}
-		
+
 		String runtimeInfo = "";
-		
+
 		// If the virtual size/CPU are 0 - do not show them
 		String virtual = "";
 		if (daemonInfo.virtualSizeMB > 0)
 		{
 			virtual = ", Virtual: " + daemonInfo.virtualSizeMB + " MB";
 		}
-		
+
 		String cpuPercentage = "";
 		if (daemonInfo.cpuPercentage > 0)
 		{
 			cpuPercentage = ", CPU: " + daemonInfo.cpuPercentage + "%";
 		}
-		
+
 		if (daemonInfo.status == DAEMON_STATUS.RUNNING)
 		{
 			runtimeInfo = "<span style=\"font-size:0.8em\">" +
@@ -372,26 +372,26 @@ public class DashboardPanel
 		{
 			walletDAT = new File(OSUtil.getBlockchainDirectory() + "/testnet3" + "/wallet.dat");
 		}
-		
+
 		if (this.OSInfo == null)
 		{
 			this.OSInfo = OSUtil.getSystemInfo();
 		}
-		
+
 		String walletEncryption = "";
 		// TODO: Use a one-off data gathering thread - better design
 		if (this.walletIsEncrypted != null)
 		{
-			walletEncryption = 
-					"<span style=\"font-size:0.8em\">" + 
+			walletEncryption =
+					"<span style=\"font-size:0.8em\">" +
 			        " (" + (this.walletIsEncrypted ? "" : "not ") + "encrypted)" +
 			        "</span>";
 		}
-		
+
 		String text =
-			"<html><span style=\"font-weight:bold;color:#303030\">zcashd</span> status: " +
+			"<html><span style=\"font-weight:bold;color:#303030\">bitcoinzd</span> status: " +
 		    daemonStatus + ",  " + runtimeInfo + " <br/>" +
-			"Wallet: <span style=\"font-weight:bold;color:#303030\">" + walletDAT.getCanonicalPath() + "</span>" + 
+			"Wallet: <span style=\"font-weight:bold;color:#303030\">" + walletDAT.getCanonicalPath() + "</span>" +
 			walletEncryption + " <br/> " +
 			"<span style=\"font-size:3px\"><br/></span>" +
 			"<span style=\"font-size:0.8em\">" +
@@ -401,25 +401,25 @@ public class DashboardPanel
 		this.daemonStatusLabel.setText(text);
 	}
 
-	
+
 	private void updateNetworkAndBlockchainLabel()
 		throws IOException, InterruptedException
 	{
 		NetworkAndBlockchainInfo info = this.netInfoGatheringThread.getLastData();
-			
+
 		// It is possible there has been no gathering initially
 		if (info == null)
 		{
 			return;
 		}
-		
+
 		// TODO: Get the start date right after ZCash release - from first block!!!
 		final Date startDate = new Date("06 Nov 2016 02:00:00 GMT");
 		final Date nowDate = new Date(System.currentTimeMillis());
-		
+
 		long fullTime = nowDate.getTime() - startDate.getTime();
 		long remainingTime = nowDate.getTime() - info.lastBlockDate.getTime();
-		
+
 		String percentage = "100";
 		if (remainingTime > 20 * 60 * 1000) // After 20 min we report 100% anyway
 		{
@@ -431,88 +431,88 @@ public class DashboardPanel
 			{
 				dPercentage = 100d;
 			}
-			
+
 			DecimalFormat df = new DecimalFormat("##0.##");
 			percentage = df.format(dPercentage);
-			
+
 			// Also set a member that may be queried
 			this.blockchainPercentage = new Integer((int)dPercentage);
 		} else
 		{
 			this.blockchainPercentage = 100;
 		}
-		
+
 		// Just in case early on the call returns some junk date
 		if (info.lastBlockDate.before(startDate))
 		{
 			// TODO: write log that we fix minimum date! - this condition should not occur
 			info.lastBlockDate = startDate;
 		}
-		
+
 		String connections = " \u26D7";
 		String tickSymbol = " \u2705";
 		OS_TYPE os = OSUtil.getOSType();
-		// Handling special symbols on Mac OS/Windows 
+		// Handling special symbols on Mac OS/Windows
 		// TODO: isolate OS-specific symbol stuff in separate code
 		if ((os == OS_TYPE.MAC_OS) || (os == OS_TYPE.WINDOWS))
 		{
 			connections = " \u21D4";
 			tickSymbol = " \u2606";
 		}
-		
+
 		String tick = "";
 		if (percentage.equals("100"))
 		{
 			tick = "<span style=\"font-weight:bold;font-size:1.4em;color:green\">" + tickSymbol + "</span>";
 		}
-		
+
 		String netColor = "red";
 		if (info.numConnections > 0)
 		{
 			netColor = "#cc3300";
 		}
-		
+
 		if (info.numConnections > 2)
 		{
 			netColor = "black";
-		}	
-		
+		}
+
 		if (info.numConnections > 6)
 		{
 			netColor = "green";
-		}		
-				
+		}
+
 		String text =
 			"<html> " +
-		    "Blockchain synchronized: <span style=\"font-weight:bold\">" + 
+		    "Blockchain synchronized: <span style=\"font-weight:bold\">" +
 			percentage + "% </span> " + tick + " <br/>" +
-			"Up to: <span style=\"font-size:0.8em;font-weight:bold\">" + 
-		    info.lastBlockDate.toLocaleString() + "</span>  <br/> " + 
-			"<span style=\"font-size:1px\"><br/></span>" + 
+			"Up to: <span style=\"font-size:0.8em;font-weight:bold\">" +
+		    info.lastBlockDate.toLocaleString() + "</span>  <br/> " +
+			"<span style=\"font-size:1px\"><br/></span>" +
 			"Network: <span style=\"font-weight:bold\">" + info.numConnections + " connections</span>" +
 			"<span style=\"font-size:1.7em;color:" + netColor + "\">" + connections + "</span>";
 		this.networkAndBlockchainLabel.setText(text);
 	}
-	
+
 
 	private void updateWalletStatusLabel()
 		throws WalletCallException, IOException, InterruptedException
 	{
 		WalletBalance balance = this.walletBalanceGatheringThread.getLastData();
-		
+
 		// It is possible there has been no gathering initially
 		if (balance == null)
 		{
 			return;
 		}
-		
+
 		// Format double numbers - else sometimes we get exponential notation 1E-4 BTCZ
-		DecimalFormat df = new DecimalFormat("########0.00######");
-		
+		DecimalFormat df = new DecimalFormat("######,##0.00######");
+
 		String transparentBalance = df.format(balance.transparentBalance);
 		String privateBalance = df.format(balance.privateBalance);
 		String totalBalance = df.format(balance.totalBalance);
-		
+
 		String transparentUCBalance = df.format(balance.transparentUnconfirmedBalance);
 		String privateUCBalance = df.format(balance.privateUnconfirmedBalance);
 		String totalUCBalance = df.format(balance.totalUnconfirmedBalance);
@@ -520,26 +520,26 @@ public class DashboardPanel
 		String color1 = transparentBalance.equals(transparentUCBalance) ? "" : "color:#cc3300;";
 		String color2 = privateBalance.equals(privateUCBalance)         ? "" : "color:#cc3300;";
 		String color3 = totalBalance.equals(totalUCBalance)             ? "" : "color:#cc3300;";
-		
+
 		String text =
-			"<html>" + 
-		    "<span style=\"font-family:monospace;font-size:1em;" + color1 + "\">Transparent balance: <span style=\"font-size:1.1em;\">" + 
+			"<html>" +
+		    "<span style=\"font-family:monospace;font-size:1em;" + color1 + "\">Transparent balance: <span style=\"font-size:1.1em;\">" +
 				transparentUCBalance + " BTCZ </span></span><br/> " +
-			"<span style=\"font-family:monospace;font-size:1em;" + color2 + "\">Private (Z) balance: <span style=\"font-weight:bold;font-size:1.1em;\">" + 
+			"<span style=\"font-family:monospace;font-size:1em;" + color2 + "\">Private (Z) balance: <span style=\"font-weight:bold;font-size:1.1em;\">" +
 		    	privateUCBalance + " BTCZ </span></span><br/> " +
-			"<span style=\"font-family:monospace;;font-size:1em;" + color3 + "\">Total (Z+T) balance: <span style=\"font-weight:bold;font-size:1.35em;\">" + 
+			"<span style=\"font-family:monospace;;font-size:1em;" + color3 + "\">Total (Z+T) balance: <span style=\"font-weight:bold;font-size:1.35em;\">" +
 		    	totalUCBalance + " BTCZ </span></span>" +
 			"<br/>  </html>";
-		
+
 		this.walletBalanceLabel.setText(text);
-		
+
 		String toolTip = null;
 		if ((!transparentBalance.equals(transparentUCBalance)) ||
 		    (!privateBalance.equals(privateUCBalance))         ||
 		    (!totalBalance.equals(totalUCBalance)))
 		{
 			toolTip = "<html>" +
-					  "Unconfirmed (unspendable) balance is being shown due to an<br/>" + 
+					  "Unconfirmed (unspendable) balance is being shown due to an<br/>" +
 		              "ongoing transaction! Actual confirmed (spendable) balance is:<br/>" +
 		              "<span style=\"font-size:5px\"><br/></span>" +
 					  "Transparent: " + transparentBalance + " BTCZ<br/>" +
@@ -547,7 +547,7 @@ public class DashboardPanel
 					  "Total ( Z+T ): <span style=\"font-weight:bold\">" + totalBalance + " BTCZ</span>" +
 					  "</html>";
 		}
-		
+
 		this.walletBalanceLabel.setToolTipText(toolTip);
 
 		if (this.parentFrame.isVisible())
@@ -561,13 +561,13 @@ public class DashboardPanel
 		throws WalletCallException, IOException, InterruptedException
 	{
 		String[][] newTransactionsData = this.transactionGatheringThread.getLastData();
-		
+
 		// May be null - not even gathered once
 		if (newTransactionsData == null)
 		{
 			return;
 		}
-			
+
 		if (Util.arraysAreDifferent(lastTransactionsData, newTransactionsData))
 		{
 			Log.info("Updating table of transactions...");
@@ -589,7 +589,7 @@ public class DashboardPanel
 	{
 		String columnNames[] = { "Type", "Direction", "Confirmed?", "Amount", "Date", "Destination Address"};
         JTable table = new TransactionTable(
-        	rowData, columnNames, this.parentFrame, this.clientCaller, this.installationObserver); 
+        	rowData, columnNames, this.parentFrame, this.clientCaller, this.installationObserver);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         table.getColumnModel().getColumn(0).setPreferredWidth(190);
         table.getColumnModel().getColumn(1).setPreferredWidth(145);
@@ -622,7 +622,7 @@ public class DashboardPanel
 		{
 			allTransactions[i++] = t;
 		}
-		
+
 		// Sort transactions by date
 		Arrays.sort(allTransactions, new Comparator<String[]>() {
 			public int compare(String[] o1, String[] o2)
@@ -648,12 +648,12 @@ public class DashboardPanel
 				}
 			}
 		});
-		
-		
+
+
 		// Confirmation symbols
 		String confirmed    = "\u2690";
 		String notConfirmed = "\u2691";
-		
+
 		// Windows does not support the flag symbol (Windows 7 by default)
 		// TODO: isolate OS-specific symbol codes in a separate class
 		OS_TYPE os = OSUtil.getOSType();
@@ -663,8 +663,8 @@ public class DashboardPanel
 			notConfirmed = " \u25B6";
 		}
 
-		DecimalFormat df = new DecimalFormat("########0.00######");
-		
+		DecimalFormat df = new DecimalFormat("######,##0.00######");
+
 		// Change the direction and date etc. attributes for presentation purposes
 		for (String[] trans : allTransactions)
 		{
@@ -688,7 +688,7 @@ public class DashboardPanel
 			{
 				trans[4] = new Date(Long.valueOf(trans[4]).longValue() * 1000L).toLocaleString();
 			}
-			
+
 			// Amount
 			try
 			{
@@ -700,19 +700,19 @@ public class DashboardPanel
 				trans[3] = df.format(amount);
 			} catch (NumberFormatException nfe)
 			{
-				Log.error("Error occurred while formatting amount: " + trans[3] + 
+				Log.error("Error occurred while formatting amount: " + trans[3] +
 						           " - " + nfe.getMessage() + "!");
 			}
-			
+
 			// Confirmed?
 			try
 			{
-				boolean isConfirmed = !trans[2].trim().equals("0"); 
-				
+				boolean isConfirmed = !trans[2].trim().equals("0");
+
 				trans[2] = isConfirmed ? ("Yes " + confirmed) : ("No  " + notConfirmed);
 			} catch (NumberFormatException nfe)
 			{
-				Log.error("Error occurred while formatting confirmations: " + trans[2] + 
+				Log.error("Error occurred while formatting confirmations: " + trans[2] +
 						           " - " + nfe.getMessage() + "!");
 			}
 		}
@@ -720,5 +720,5 @@ public class DashboardPanel
 
 		return allTransactions;
 	}
-	
+
 } // End class
