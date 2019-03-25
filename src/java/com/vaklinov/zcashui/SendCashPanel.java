@@ -107,7 +107,6 @@ public class SendCashPanel
 	private int          operationStatusCounter      						= 0;
 	private Timer 							destinationAmountFieldStart						 = null;
  private int 									destinationAmountFieldWait							 = 3000;
- private int 									destinationAmountFieldElapsed					= 0;
 
 	public SendCashPanel(ZCashClientCaller clientCaller,
 			             StatusUpdateErrorReporter errorReporter,
@@ -349,7 +348,7 @@ public class SendCashPanel
 			}
 		});
 
-  destinationAmountFieldStart = new Timer(5000, new ActionListener()
+  destinationAmountFieldStart = new Timer(destinationAmountFieldWait, new ActionListener()
 		{
 						@Override
 						public void actionPerformed(ActionEvent e)
