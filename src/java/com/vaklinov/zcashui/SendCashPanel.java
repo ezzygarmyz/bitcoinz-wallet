@@ -105,8 +105,7 @@ public class SendCashPanel
 	private Timer        operationStatusTimer        						= null;
 	private String       operationStatusID           						= null;
 	private int          operationStatusCounter      						= 0;
-	private Timer 							destinationAmountFieldStart						 = null;
- private int 									destinationAmountFieldWait							 = 3000;
+
 
 	public SendCashPanel(ZCashClientCaller clientCaller,
 			             StatusUpdateErrorReporter errorReporter,
@@ -347,52 +346,6 @@ public class SendCashPanel
 				}
 			}
 		});
-
-  destinationAmountFieldStart = new Timer(destinationAmountFieldWait, new ActionListener()
-		{
-						@Override
-						public void actionPerformed(ActionEvent e)
-						{
-							try
-							{
-								 String text = destinationAmountField.getText();
-									if (text.length() > 0)
-									{
-										DecimalFormat df = new DecimalFormat("######,###.########");
-										df.setRoundingMode(RoundingMode.CEILING);
-										Number amount = df.parse(text);
-										String formatted = df.format(amount);
-										destinationAmountField.setText(formatted);
-									}
-
-							} catch (Exception ex)
-							{
-								Log.error("Unexpected error", ex);
-								// java.awt.datatransfer.UnsupportedFlavorException: Unicode String
-								//SendCashPanel.this.errorReporter.reportError(ex);
-							}
-						}
-   	});
-
-		destinationAmountField.addKeyListener(new KeyAdapter()
-		{
-
-						@Override
-						public void keyReleased(KeyEvent e)
-						{
-							try
-							{
-									destinationAmountFieldStart.restart();
-									destinationAmountFieldStart.start();
-
-							} catch (Exception ex)
-							{
-								Log.error("Unexpected error", ex);
-								// java.awt.datatransfer.UnsupportedFlavorException: Unicode String
-								//SendCashPanel.this.errorReporter.reportError(ex);
-							}
-						}
-   	});
 
         this.destinationAddressField.addMouseListener(new MouseAdapter()
         {

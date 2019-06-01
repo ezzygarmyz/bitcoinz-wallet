@@ -1,6 +1,7 @@
 *.class
 
 build/**
+bitcoinz-wallet-ubuntu/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
