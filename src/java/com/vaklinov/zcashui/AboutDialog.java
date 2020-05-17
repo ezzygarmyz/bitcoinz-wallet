@@ -69,7 +69,7 @@ public class AboutDialog
 
 		JTabbedPane tabs = new JTabbedPane();
 
-		
+
 		JPanel PD = new JPanel();
 		PD.setLayout(new BorderLayout(3, 3));
 		PD.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
@@ -121,7 +121,7 @@ public class AboutDialog
 		JLabel licenseLabel = new JLabel();
 		licenseLabel.setText(
 			"<html><body><pre>" +
-		    " Copyright (c) 2017-2018 BitcoinZ team &gt; \n" +
+		    " Copyright (c) 2017-2020 BitcoinZ team &gt; \n" +
 		    " Copyright (c) 2016-2018 Ivan Vaklinov &lt;ivan@vaklinov.com&gt; \n" +
 			"\n" +
 			" Permission is hereby granted, free of charge, to any person obtaining a copy\n" +
@@ -165,7 +165,7 @@ public class AboutDialog
 					AboutDialog.this.dispose();
 				}
 		});
-		
+
 		pack();
 	}
 }
