@@ -123,14 +123,14 @@ public class TransactionTable
 					try
 					{
 						String txID = TransactionTable.this.getModel().getValueAt(lastRow, 6).toString();
-						txID = txID.replaceAll("\"", ""); // In case it has quotes
+						txID = txID.replaceAll("\"", ""); // Ihttps://test.explorer.btcz.app/n case it has quotes
 
 						Log.info("Transaction ID for block explorer is: " + txID);
 						// https://explorer.zcha.in/transactions/<ID>
 						String urlPrefix = "https://explorer.btcz.rocks/tx/";
 						if (installationObserver.isOnTestNet())
 						{
-							urlPrefix = "http://testnet.explorer.btcz.life:3002/tx/";
+							urlPrefix = "https://test.explorer.btcz.app/tx/";
 						}
 
 						Desktop.getDesktop().browse(new URL(urlPrefix + txID).toURI());
