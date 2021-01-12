@@ -130,7 +130,7 @@ public class TransactionTable
 						String urlPrefix = "https://explorer.btcz.rocks/tx/";
 						if (installationObserver.isOnTestNet())
 						{
-							urlPrefix = "http://testnet.explorer.btcz.life:3002/tx/";
+							urlPrefix = "https://test.explorer.btcz.app/tx/";
 						}
 
 						Desktop.getDesktop().browse(new URL(urlPrefix + txID).toURI());
