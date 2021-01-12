@@ -121,7 +121,7 @@ public class AboutDialog
 		JLabel licenseLabel = new JLabel();
 		licenseLabel.setText(
 			"<html><body><pre>" +
-		    " Copyright (c) 2017-2020 BitcoinZ team &gt; \n" +
+		    " Copyright (c) 2017-2021 BitcoinZ team &gt; \n" +
 		    " Copyright (c) 2016-2018 Ivan Vaklinov &lt;ivan@vaklinov.com&gt; \n" +
 			"\n" +
 			" Permission is hereby granted, free of charge, to any person obtaining a copy\n" +
