@@ -84,7 +84,7 @@ public class ZCashUI
 
     private JMenuItem menuItemExit;
     private JMenuItem menuItemAbout;
-    //private JMenuItem menuItemEncrypt;
+    private JMenuItem menuItemEncrypt;
     private JMenuItem menuItemBackup;
     private JMenuItem menuItemExportKeys;
     private JMenuItem menuItemImportKeys;
@@ -198,8 +198,8 @@ public class ZCashUI
         wallet.setMnemonic(KeyEvent.VK_W);
         wallet.add(menuItemBackup = new JMenuItem("Backup...", KeyEvent.VK_B));
         menuItemBackup.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, accelaratorKeyMask));
-        //wallet.add(menuItemEncrypt = new JMenuItem("Encrypt...", KeyEvent.VK_E));
-        //menuItemEncrypt.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, accelaratorKeyMask));
+        wallet.add(menuItemEncrypt = new JMenuItem("Encrypt...", KeyEvent.VK_E));
+        menuItemEncrypt.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, accelaratorKeyMask));
         wallet.add(menuItemExportKeys = new JMenuItem("Export private keys...", KeyEvent.VK_K));
         menuItemExportKeys.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, accelaratorKeyMask));
         wallet.add(menuItemImportKeys = new JMenuItem("Import private keys...", KeyEvent.VK_I));
@@ -284,16 +284,16 @@ public class ZCashUI
             }
         );
 
-//        menuItemEncrypt.addActionListener(
-//            new ActionListener()
-//            {
-//                @Override
-//                public void actionPerformed(ActionEvent e)
-//                {
-//                    ZCashUI.this.walletOps.encryptWallet();
-//                }
-//            }
-//        );
+       menuItemEncrypt.addActionListener(
+           new ActionListener()
+           {
+               @Override
+               public void actionPerformed(ActionEvent e)
+               {
+                   ZCashUI.this.walletOps.encryptWallet();
+               }
+           }
+       );
 
         menuItemExportKeys.addActionListener(
             new ActionListener()

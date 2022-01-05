@@ -911,6 +911,45 @@ public class ZCashClientCaller
 	}
 
 
+
+
+
+
+	public synchronized String getSignedMessage(String address, String message)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		String response = this.executeCommandAndGetSingleStringResponse(
+			"signmessage", wrapStringParameter(address), wrapStringParameter(message));
+
+		return response.trim();
+	}
+
+
+	public synchronized String mergeToAddress(String address)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		String response = this.executeCommandAndGetSingleStringResponse(
+			"z_mergetoaddress", wrapStringParameter("[\"ANY_TADDR\"]"), wrapStringParameter(address));
+
+		return response.trim();
+	}
+
+
+	public synchronized String shieldCoinbase(String address)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		String response = this.executeCommandAndGetSingleStringResponse(
+			"z_shieldcoinbase", wrapStringParameter("*"), wrapStringParameter(address));
+
+		return response.trim();
+	}
+
+
+
+
+
+
+
 	public synchronized String getTPrivateKey(String address)
 		throws WalletCallException, IOException, InterruptedException
 	{

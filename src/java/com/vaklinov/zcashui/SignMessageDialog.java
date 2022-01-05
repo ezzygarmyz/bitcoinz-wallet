@@ -52,7 +52,7 @@ import javax.swing.JTextField;
  *
  * @author Ivan Vaklinov <ivan@vaklinov.com>
  */
-public class PasswordDialog
+public class SignMessageDialog
 	extends JDialog
 {
 	protected boolean isOKPressed = false;
@@ -67,11 +67,11 @@ public class PasswordDialog
 	protected JPanel freeSlotPanel;
 	protected JPanel freeSlotPanel2;
 
-	public PasswordDialog(JFrame parent)
+	public SignMessageDialog(JFrame parent)
 	{
 		super(parent);
 
-		this.setTitle("Password...");
+		this.setTitle("Sign Message...");
 	    this.setLocation(parent.getLocation().x + 50, parent.getLocation().y + 50);
 		this.setModal(true);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -81,9 +81,8 @@ public class PasswordDialog
 		controlsPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
 		JPanel tempPanel = new JPanel(new BorderLayout(0, 0));
-		tempPanel.add(this.upperLabel = new JLabel("<html>The wallet is encrypted and protected with a password. " +
-											                         "Please enter the password to unlock it temporarily during " +
-													                 		 "the operation</html>"), BorderLayout.CENTER);
+		tempPanel.add(this.upperLabel = new JLabel(	"<html>The signature will be encoded with the following message" +
+		                         										" and the private key.</html>"), BorderLayout.CENTER);
 		controlsPanel.add(tempPanel);
 
 		JLabel dividerLabel = new JLabel("   ");
@@ -91,8 +90,8 @@ public class PasswordDialog
 		controlsPanel.add(dividerLabel);
 
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		tempPanel.add(passwordLabel = new JLabel("Password: "));
-		tempPanel.add(passwordField = new JPasswordField(30));
+		tempPanel.add(passwordLabel = new JLabel("Message: "));
+		tempPanel.add(passwordField = new JTextField(30));
 		controlsPanel.add(tempPanel);
 
 		dividerLabel = new JLabel("   ");
@@ -106,12 +105,8 @@ public class PasswordDialog
 		controlsPanel.add(this.freeSlotPanel2);
 
 		tempPanel = new JPanel(new BorderLayout(0, 0));
-		tempPanel.add(this.lowerLabel = new JLabel("<html><span style=\"font-weight:bold\">" +
-												                         "WARNING: Never enter your password on a public/shared " +
-												                         "computer or one that you suspect has been infected with malware! " +
-															                 "</span></html>"), BorderLayout.CENTER);
+		tempPanel.add(this.lowerLabel = new JLabel("<html></html>"), BorderLayout.CENTER);
 		controlsPanel.add(tempPanel);
-
 
 		this.getContentPane().setLayout(new BorderLayout(0, 0));
 		this.getContentPane().add(controlsPanel, BorderLayout.NORTH);
@@ -131,7 +126,7 @@ public class PasswordDialog
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				PasswordDialog.this.processOK();
+				SignMessageDialog.this.processOK();
 			}
 		});
 
@@ -140,15 +135,15 @@ public class PasswordDialog
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				PasswordDialog.this.setVisible(false);
-				PasswordDialog.this.dispose();
+				SignMessageDialog.this.setVisible(false);
+				SignMessageDialog.this.dispose();
 
-				PasswordDialog.this.isOKPressed = false;
-				PasswordDialog.this.password = null;
+				SignMessageDialog.this.isOKPressed = false;
+				SignMessageDialog.this.password = null;
 			}
 		});
 
-		this.setSize(450, 220);
+		this.setSize(450, 190);
 		this.validate();
 		this.repaint();
 	}
@@ -156,22 +151,22 @@ public class PasswordDialog
 
 	protected void processOK()
 	{
-		String pass = PasswordDialog.this.passwordField.getText();
+		String pass = SignMessageDialog.this.passwordField.getText();
 
 		if ((pass == null) || (pass.trim().length() <= 0))
 		{
 			JOptionPane.showMessageDialog(
-				PasswordDialog.this.getParent(),
+				SignMessageDialog.this.getParent(),
 				"The password is empty. Please enter it into the text field.", "Empty...",
 				JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
-		PasswordDialog.this.setVisible(false);
-		PasswordDialog.this.dispose();
+		SignMessageDialog.this.setVisible(false);
+		SignMessageDialog.this.dispose();
 
-		PasswordDialog.this.isOKPressed = true;
-		PasswordDialog.this.password = pass;
+		SignMessageDialog.this.isOKPressed = true;
+		SignMessageDialog.this.password = pass;
 	}
 
 
@@ -181,7 +176,7 @@ public class PasswordDialog
 	}
 
 
-	public String getPassword()
+	public String getMessage()
 	{
 		return this.password;
 	}

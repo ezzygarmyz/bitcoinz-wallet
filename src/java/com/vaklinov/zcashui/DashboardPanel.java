@@ -122,7 +122,7 @@ public class DashboardPanel
 
 		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 9));
 		JLabel logoLabel = new JLabel(new ImageIcon(
-			this.getClass().getClassLoader().getResource("images/btz_icon.png")));
+			this.getClass().getClassLoader().getResource("images/bitcoinz40x40.png")));
 		tempPanel.add(logoLabel);
 		// TODO: use relative size
 		JLabel zcLabel = new JLabel("BitcoinZ Wallet ");
@@ -490,7 +490,7 @@ public class DashboardPanel
 		    info.lastBlockDate.toLocaleString() + "</span>  <br/> " +
 			"<span style=\"font-size:1px\"><br/></span>" +
 			"Network: <span style=\"font-weight:bold\">" + info.numConnections + " connections</span>" +
-			"<span style=\"font-size:1.7em;color:" + netColor + "\">" + connections + "</span>";
+			"<span style=\"font-size:1.7em;color:" + netColor + "\">" + tick + "</span>"; // connections
 		this.networkAndBlockchainLabel.setText(text);
 	}
 
