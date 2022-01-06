@@ -238,7 +238,7 @@ public class ZCashUI
         mb.add(messaging);
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
-        //menuItemEncrypt.setEnabled(false);
+        menuItemEncrypt.setEnabled(false); // Also wait on v2.0.7-u2 to decide if enable it or not.
 
         this.setJMenuBar(mb);
 
