@@ -1,12 +1,12 @@
 <!--
- *  _________          _     ____          _           __        __    _ _      _   _   _ ___
- * |__  / ___|__ _ ___| |__ / ___|_      _(_)_ __   __ \ \      / /_ _| | | ___| |_| | | |_ _|
- *   / / |   / _` / __| '_ \\___ \ \ /\ / / | '_ \ / _` \ \ /\ / / _` | | |/ _ \ __| | | || |
- *  / /| |__| (_| \__ \ | | |___) \ V  V /| | | | | (_| |\ V  V / (_| | | |  __/ |_| |_| || |
- * /____\____\__,_|___/_| |_|____/ \_/\_/ |_|_| |_|\__, | \_/\_/ \__,_|_|_|\___|\__|\___/|___|
- *                                                 |___/
- *
- * Copyright (c) 2016-2017 Ivan Vaklinov <ivan@vaklinov.com>
+ *  ____ _____ ______ ___   __ _____  __   _ _____ _        __    _ _      _   _   _ ___
+ * | __ \_   _|_   __| __|/ _ \_   _||   \| |___  | \      / /_ _| | | ___| |_| | | |_ _|
+ * |____/ | |   | |/ /   / / \ \| |  | |\ | |  / / \ \ /\ / / _` | | |/ _ \ __| | | || |
+ * | ___ \| |_  | |\ \__ \ \_/ /| |_ | | \  | / /_  \ V  V / (_| | | |  __/ |_| |_| || |
+ * |_____/____| |_| \____|\___/_____||_|  \_|/____|  \_/\_/ \__,_|_|_|\___|\__|\___/|___|
+
+ * Copyright (c) 2017-2022 BitcoinZ team
+ * Copyright (c) 2016 Ivan Vaklinov <ivan@vaklinov.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@
     <property name="jar.dir"     value="${build.dir}/jars"/>
 	<property name="ubuntu.package.dir" value="${build.dir}/../bitcoinz-wallet-ubuntu"/>
 
-    <property name="main-class"  value="com.vaklinov.zcashui.ZCashUI"/>
+    <property name="main-class"  value="com.bitcoinz.btczui.BtczUI"/>
 
 	<path id="main-classpath">
 		<pathelement path="${basedir}/lib/bitcoinj-core-0.14.5.jar" />
@@ -100,7 +100,7 @@
 
     <target name="ubuntuPackage" depends="jar,copyothers">
     	<mkdir dir="${ubuntu.package.dir}"/>
-	    <deb destfile="${ubuntu.package.dir}/bitcoinz-wallet_2.0.7.deb"
+	    <deb destfile="${ubuntu.package.dir}/bitcoinz-wallet_2.0.7-u2.deb"
 	    	 control="${src.dir}/resources/ubuntu-package"
 	    	 verbose="true">
 

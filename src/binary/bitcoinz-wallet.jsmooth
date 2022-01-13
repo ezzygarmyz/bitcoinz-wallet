@@ -16,7 +16,7 @@
 <iconLocation>..\resources\images\BitcoinZ.png</iconLocation>
 <initialMemoryHeap>536870912</initialMemoryHeap>
 <jarLocation>BitcoinZWallet.jar</jarLocation>
-<mainClassName>com.vaklinov.zcashui.ZCashUI</mainClassName>
+<mainClassName>com.bitcoinz.btczui.BtczUI</mainClassName>
 <maximumMemoryHeap>1073741824</maximumMemoryHeap>
 <maximumVersion></maximumVersion>
 <minimumVersion></minimumVersion>
