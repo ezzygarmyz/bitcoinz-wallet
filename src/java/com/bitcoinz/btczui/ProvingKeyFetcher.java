@@ -72,11 +72,11 @@ public class ProvingKeyFetcher {
         // TODO: isolate getting btczParams in a utility method
         if (ost == OS_TYPE.WINDOWS)
         {
-        	btczParams = new File(System.getenv("APPDATA") + "/btczParams");
+        	btczParams = new File(System.getenv("APPDATA") + "/ZcashParams");
         } else if (ost == OS_TYPE.MAC_OS)
         {
         	File userHome = new File(System.getProperty("user.home"));
-        	btczParams = new File(userHome, "Library/Application Support/btczParams");
+        	btczParams = new File(userHome, "Library/Application Support/ZcashParams");
         }
 
         btczParams = btczParams.getCanonicalFile();
