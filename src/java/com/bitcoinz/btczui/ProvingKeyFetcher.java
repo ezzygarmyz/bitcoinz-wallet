@@ -9,7 +9,6 @@
  * Copyright (c) 2016 Ivan Vaklinov <ivan@vaklinov.com>
 
  */
- 
 
 package com.bitcoinz.btczui;
 
@@ -32,7 +31,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitorInputStream;
-import javax.xml.bind.DatatypeConverter;
 
 import com.bitcoinz.btczui.OSUtil.OS_TYPE;
 
@@ -269,7 +267,7 @@ public class ProvingKeyFetcher {
             byte [] temp = new byte[0x1 << 13];
             while(dis.read(temp) >= 0);
             byte [] digest = sha256.digest();
-            return SHA256.equalsIgnoreCase(DatatypeConverter.printHexBinary(digest));
+            return SHA256.equalsIgnoreCase(Util.bytesToHex(digest));
         }
     }
 
@@ -290,7 +288,7 @@ public class ProvingKeyFetcher {
             byte [] temp = new byte[0x1 << 13];
             while(dis.read(temp) >= 0);
             byte [] digest = sha256.digest();
-            return SHA256SG.equalsIgnoreCase(DatatypeConverter.printHexBinary(digest));
+            return SHA256SG.equalsIgnoreCase(Util.bytesToHex(digest));
         }
     }
 
@@ -311,7 +309,7 @@ public class ProvingKeyFetcher {
             byte [] temp = new byte[0x1 << 13];
             while(dis.read(temp) >= 0);
             byte [] digest = sha256.digest();
-            return SHA256SS.equalsIgnoreCase(DatatypeConverter.printHexBinary(digest));
+            return SHA256SS.equalsIgnoreCase(Util.bytesToHex(digest));
         }
     }
 }
