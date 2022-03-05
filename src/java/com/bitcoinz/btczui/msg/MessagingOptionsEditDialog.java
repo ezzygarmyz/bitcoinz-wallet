@@ -74,6 +74,7 @@ public class MessagingOptionsEditDialog
 	protected JTextField amountTextField;
 	protected JTextField transactionFeeTextField;
 	protected JCheckBox  automaticallyAddUsers;
+	protected JCheckBox  disableMessaging;
 
 	public MessagingOptionsEditDialog(JFrame parentFrame, MessagingStorage storage, StatusUpdateErrorReporter errorReporter)
 		throws IOException
@@ -104,12 +105,13 @@ public class MessagingOptionsEditDialog
 		JPanel detailsPanel = new JPanel();
 		detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
 
-		addFormField(detailsPanel, "Automatically add users to contact list:",
-				     automaticallyAddUsers = new JCheckBox());
+		addFormField(detailsPanel, "Disable Messaging ", disableMessaging = new JCheckBox());
+		addFormField(detailsPanel, "Automatically add users to contact list:", automaticallyAddUsers = new JCheckBox());
 		addFormField(detailsPanel, "BTCZ amount to send with every message:",   amountTextField = new JTextField(12));
 		addFormField(detailsPanel, "Transaction fee:",  transactionFeeTextField = new JTextField(12));
 
 		DecimalFormatSymbols decSymbols = new DecimalFormatSymbols(Locale.ROOT);
+		disableMessaging.setSelected(options.isMessagingDisabled());
 		automaticallyAddUsers.setSelected(options.isAutomaticallyAddUsersIfNotExplicitlyImported());
 		amountTextField.setText(new DecimalFormat("########0.00######", decSymbols).format(options.getAmountToSend()));
 		transactionFeeTextField.setText(new DecimalFormat("########0.00######", decSymbols).format(options.getTransactionFee()));
@@ -156,8 +158,9 @@ public class MessagingOptionsEditDialog
 
 					options.setAmountToSend(Double.parseDouble(amountToSend));
 					options.setTransactionFee(Double.parseDouble(transactionFee));
-					options.setAutomaticallyAddUsersIfNotExplicitlyImported(
-						MessagingOptionsEditDialog.this.automaticallyAddUsers.isSelected());
+					options.setMessagingDisabled(MessagingOptionsEditDialog.this.disableMessaging.isSelected());
+					options.setAutomaticallyAddUsersIfNotExplicitlyImported(MessagingOptionsEditDialog.this.automaticallyAddUsers.isSelected());
+
 
 					MessagingOptionsEditDialog.this.storage.updateMessagingOptions(options);
 

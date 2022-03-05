@@ -66,6 +66,9 @@ import com.bitcoinz.btczui.BTCZInstallationObserver.DAEMON_STATUS;
 import com.bitcoinz.btczui.BTCZInstallationObserver.DaemonInfo;
 import com.bitcoinz.btczui.BTCZInstallationObserver.InstallationDetectionException;
 import com.bitcoinz.btczui.msg.MessagingPanel;
+import com.bitcoinz.btczui.msg.MessagingStorage;
+//import com.bitcoinz.btczui.msg.MessagingOptions;
+
 
 
 /**
@@ -103,6 +106,7 @@ public class BtczUI
     private SendCashPanel    sendPanel;
     private AddressBookPanel addressBookPanel;
     private MessagingPanel   messagingPanel;
+    private MessagingStorage messagingStorage;
     private List<Image>      imageList;
 
     JTabbedPane tabs;
@@ -111,7 +115,7 @@ public class BtczUI
     public BtczUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("BitcoinZ Wallet 2.0.7-u2");
+        super("BitcoinZ Wallet 2.1.0-rc1");
 
         if (progressDialog != null)
         {
@@ -162,9 +166,16 @@ public class BtczUI
         tabs.addTab("Address book ",
     		        new ImageIcon(cl.getResource("images/address-book.png")),
     		        addressBookPanel = new AddressBookPanel(sendPanel, tabs));
+
         tabs.addTab("Messaging ",
-		            new ImageIcon(cl.getResource("images/messaging.png")),
-		            messagingPanel = new MessagingPanel(this, sendPanel, tabs, clientCaller, errorReporter));
+                new ImageIcon(cl.getResource("images/messaging.png")),
+                messagingPanel = new MessagingPanel(this, sendPanel, tabs, clientCaller, errorReporter));
+
+        // Disable Messaging tab option
+        messagingStorage = new MessagingStorage();
+        boolean msgDisabled = messagingStorage.getMessagingOptions().isMessagingDisabled();
+        if (msgDisabled) {tabs.setEnabledAt(4,false);}
+
         contentPane.add(tabs);
 
         this.walletOps = new WalletOperations(
@@ -235,9 +246,14 @@ public class BtczUI
         shareFileVia.add(menuItemShareFileViaIPFS = new JMenuItem("IPFS", KeyEvent.VK_F));
         menuItemShareFileViaIPFS.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, accelaratorKeyMask));
 
-        mb.add(messaging);
+        // TODO: Move the zMessaging disable option somwhere else.
+        // This will allows to also disable the menu.
+        //if (!msgDisabled)  {
+          mb.add(messaging);
+        //}
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
+        // Enabled as own user risk !
         //menuItemEncrypt.setEnabled(false);
 
         this.setJMenuBar(mb);

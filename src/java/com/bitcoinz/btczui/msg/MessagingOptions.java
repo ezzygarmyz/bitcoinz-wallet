@@ -51,6 +51,8 @@ import com.bitcoinz.btczui.Util;
  */
 public class MessagingOptions
 {
+
+	private boolean messagingIsDisabled;
 	private boolean automaticallyAddUsersIfNotExplicitlyImported;
 	private double  amountToSend;
 	private double  transactionFee;
@@ -59,6 +61,7 @@ public class MessagingOptions
 	public MessagingOptions()
 	{
 		// Default values set if not loade etc.
+		this.messagingIsDisabled = true;
 		this.automaticallyAddUsersIfNotExplicitlyImported = true;
 		this.amountToSend = this.transactionFee = 0.0001d;
 	}
@@ -96,8 +99,8 @@ public class MessagingOptions
 		throws IOException
 	{
 		// Mandatory fields!
-		this.automaticallyAddUsersIfNotExplicitlyImported =
-			obj.getBoolean("automaticallyaddusersifnotexplicitlyimported", true);
+		this.messagingIsDisabled = obj.getBoolean("messagingdisabled", true);
+		this.automaticallyAddUsersIfNotExplicitlyImported = obj.getBoolean("automaticallyaddusersifnotexplicitlyimported", true);
 		this.amountToSend   = obj.getDouble("amounttosend",   0.0001d);
 		this.transactionFee = obj.getDouble("transactionfee", 0.0001d);
 	}
@@ -107,8 +110,8 @@ public class MessagingOptions
 	{
 		JsonObject obj = new JsonObject();
 
-		obj.set("automaticallyaddusersifnotexplicitlyimported",
-				this.automaticallyAddUsersIfNotExplicitlyImported);
+		obj.set("messagingdisabled", this.messagingIsDisabled);
+		obj.set("automaticallyaddusersifnotexplicitlyimported", this.automaticallyAddUsersIfNotExplicitlyImported);
 		obj.set("amounttosend",	this.amountToSend);
 		obj.set("transactionfee",	this.transactionFee);
 
@@ -135,11 +138,21 @@ public class MessagingOptions
 	}
 
 
+	public boolean isMessagingDisabled()
+	{
+		return messagingIsDisabled;
+	}
+
 	public boolean isAutomaticallyAddUsersIfNotExplicitlyImported()
 	{
 		return automaticallyAddUsersIfNotExplicitlyImported;
 	}
 
+
+	public void setMessagingDisabled(boolean messagingIsDisabled)
+	{
+		this.messagingIsDisabled = messagingIsDisabled;
+	}
 
 	public void setAutomaticallyAddUsersIfNotExplicitlyImported(boolean automaticallyAddUsersIfNotExplicitlyImported)
 	{
