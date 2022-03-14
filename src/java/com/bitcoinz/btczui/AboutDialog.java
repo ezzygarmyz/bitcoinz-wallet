@@ -183,7 +183,8 @@ public class AboutDialog extends JDialog{
 
 						"<b><u>v2.1.0-rc1 (MAR-2022)</u></b><br>"+
 						"- Added option to disable the (z) messaging. <br>"+
-						"- Code tweak and refresh. <br><br>""+
+						"- Added Raw TX tab with data send capability. <br>"+
+						"- Code tweak and refresh. <br><br>"+
 
 						"<b><u>v2.0.7-u2 (FEB-2022)</u></b><br>"+
 						"- Complete BTCZ'ify of the source code. <br>"+

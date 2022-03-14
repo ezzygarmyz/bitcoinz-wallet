@@ -104,6 +104,7 @@ public class BtczUI
     private DashboardPanel   dashboard;
     private AddressesPanel   addresses;
     private SendCashPanel    sendPanel;
+    private RawTXPanel       rawTXPanel;
     private AddressBookPanel addressBookPanel;
     private MessagingPanel   messagingPanel;
     private MessagingStorage messagingStorage;
@@ -163,6 +164,11 @@ public class BtczUI
         tabs.addTab("Send cash ",
         		    new ImageIcon(cl.getResource("images/send.png")),
         		    sendPanel = new SendCashPanel(clientCaller, errorReporter, installationObserver, backupTracker));
+
+        tabs.addTab("Raw Transaction ",
+        		    new ImageIcon(cl.getResource("images/send.png")),
+        		    rawTXPanel = new RawTXPanel(clientCaller, errorReporter, installationObserver, backupTracker));
+
         tabs.addTab("Address book ",
     		        new ImageIcon(cl.getResource("images/address-book.png")),
     		        addressBookPanel = new AddressBookPanel(sendPanel, tabs));
@@ -174,7 +180,7 @@ public class BtczUI
         // Disable Messaging tab option
         messagingStorage = new MessagingStorage();
         boolean msgDisabled = messagingStorage.getMessagingOptions().isMessagingDisabled();
-        if (msgDisabled) {tabs.setEnabledAt(4,false);}
+        if (msgDisabled) {tabs.setEnabledAt(5,false);}
 
         contentPane.add(tabs);
 
