@@ -116,7 +116,7 @@ public class BtczUI
     public BtczUI(StartupProgressDialog progressDialog)
         throws IOException, InterruptedException, WalletCallException
     {
-        super("BitcoinZ Wallet 2.1.0-rc1");
+        super("BitcoinZ Wallet 2.0.7-u3");
 
         if (progressDialog != null)
         {
