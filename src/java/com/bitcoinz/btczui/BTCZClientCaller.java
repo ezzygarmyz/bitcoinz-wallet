@@ -487,6 +487,85 @@ public class BTCZClientCaller
 	}
 
 
+
+
+
+
+
+	// Returns tx hash
+	public synchronized String sendRAWtx(String from, String to, String amount, String memo, String transactionFee)
+		throws WalletCallException, IOException, InterruptedException
+	{
+
+		StringBuilder hexMemo = new StringBuilder();
+		for (byte c : memo.getBytes("UTF-8"))
+		{
+			String hexChar = Integer.toHexString((int)c);
+			if (hexChar.length() < 2)
+			{
+				hexChar = "0" + hexChar;
+			}
+			hexMemo.append(hexChar);
+		}
+
+		DecimalFormatSymbols decSymbols = new DecimalFormatSymbols(Locale.ROOT);
+
+
+		// Transaction fee as a number
+		if ((transactionFee == null) || (transactionFee.trim().length() <= 0)) {
+			transactionFee = "0.0001"; // Default value
+		} else {
+			transactionFee = new DecimalFormat(
+				"########0.00######", decSymbols).format(Double.valueOf(transactionFee));
+		}
+
+
+		// Get the unspent array   "[\"t1PGFqEzfmQch1gKD3ra4k18PNj3tTUUSqg\"]@
+		JsonArray responseUnspent = this.executeCommandAndGetJsonArray("listunspent", "0", "99999", "[\""+from+"\"]");
+		JsonObject jsonObj = responseUnspent.get(0).asObject();
+		String status = jsonObj.getString("status", "ERROR");
+		Log.info("The unspent are: " + responseUnspent.toString());
+
+		// Get all unspent amount
+		Double amountUnspentTot = 0.0;
+		for (int i=0;i<responseUnspent.size();i++) {
+			jsonObj = responseUnspent.get(i).asObject();
+      amountUnspentTot += jsonObj.getDouble("amount", 0.00);
+    }
+
+
+		// Get the return amount
+		Double returnAmount = amountUnspentTot - (Double.valueOf(amount) + Double.valueOf(transactionFee));
+
+		// Set the tx json array
+		String txAddr = "";
+		if (to == from) {
+			amount += returnAmount;
+			txAddr = "{\""+to+"\" : "+new DecimalFormat("########0.00######", decSymbols).format(Double.valueOf(amount))+", \"data\" : \""+hexMemo+"\"}";
+		} else if (returnAmount == 0) {
+			txAddr = "{\""+to+"\" : "+new DecimalFormat("########0.00######", decSymbols).format(Double.valueOf(amount))+", \"data\" : \""+hexMemo+"\"}";
+		} else {
+			txAddr = "{\""+to+"\" : "+new DecimalFormat("########0.00######", decSymbols).format(Double.valueOf(amount))+", \""+from+"\" : "+new DecimalFormat("########0.00######", decSymbols).format(returnAmount)+", \"data\" : \""+hexMemo+"\"}";
+		}
+
+		Log.info("The tx are: " + txAddr);
+		String rawTX = this.executeCommandAndGetSingleStringResponse("createrawtransaction", wrapStringParameter(responseUnspent.toString()), wrapStringParameter(txAddr));
+
+		Log.info("The following raw TX will be signed: " + rawTX.trim());
+		JsonObject signedTX = this.executeCommandAndGetJsonObject("signrawtransaction", rawTX.trim());
+
+		Log.info("The following  signed TX will be sent: " + signedTX.getString("hex", "ERROR"));
+		String txHex = this.executeCommandAndGetSingleStringResponse("sendrawtransaction", signedTX.getString("hex", "ERROR"));
+
+		return txHex.trim();
+	}
+
+
+
+
+
+
+
 	// Returns OPID
 	public synchronized String sendCash(String from, String to, String amount, String memo, String transactionFee)
 		throws WalletCallException, IOException, InterruptedException
@@ -1106,6 +1185,24 @@ public class BTCZClientCaller
 	}
 
 
+	private JsonArray executeCommandAndGetJsonArray(String command1, String command2, String command3, String command4)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		JsonValue response = this.executeCommandAndGetJsonValue(command1, command2, command3, command4);
+
+		if (response.isArray())
+		{
+			return response.asArray();
+		} else
+		{
+			throw new WalletCallException("Unexpected non-array response from wallet: " + response.toString());
+		}
+	}
+
+
+
+
+
 	private JsonValue executeCommandAndGetJsonValue(String command1, String command2)
 			throws WalletCallException, IOException, InterruptedException
 	{
@@ -1129,6 +1226,27 @@ public class BTCZClientCaller
 
 		return response;
 	}
+
+
+
+	private JsonValue executeCommandAndGetJsonValue(String command1, String command2, String command3,  String command4)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		String strResponse = this.executeCommandAndGetSingleStringResponse(command1, command2, command3, command4);
+
+		JsonValue response = null;
+		try
+		{
+		  	response = Json.parse(strResponse);
+		} catch (ParseException pe)
+		{
+		  	throw new WalletCallException(strResponse + "\n" + pe.getMessage() + "\n", pe);
+		}
+
+		return response;
+	}
+
+
 
 
 	private String executeCommandAndGetSingleStringResponse(String command1)

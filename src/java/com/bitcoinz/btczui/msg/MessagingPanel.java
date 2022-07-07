@@ -1517,257 +1517,282 @@ public class MessagingPanel
 		throws IOException, WalletCallException, InterruptedException
 	{
 		MessagingIdentity ownIdentity = this.messagingStorage.getOwnIdentity();
+		MessagingOptions msgOptions = this.messagingStorage.getMessagingOptions();
 
-		// Check to make sure the Z address of the messaging identity is valid
-		if ((ownIdentity != null) && (!this.identityZAddressValidityChecked))
-		{
-			String ownZAddress = ownIdentity.getSendreceiveaddress();
-			String[] walletZaddresses = this.clientCaller.getWalletZAddresses();
+		// Check if Messaging is disabled or not.
+		// TODO : Disable the entire tab if isMessabingDisabled = true
+		if (!msgOptions.isMessagingDisabled()) {
 
-			boolean bFound = false;
-			for (String address : walletZaddresses)
+			// Check to make sure the Z address of the messaging identity is valid
+			if ((ownIdentity != null) && (!this.identityZAddressValidityChecked))
 			{
-				if (ownZAddress.equals(address))
+				String ownZAddress = ownIdentity.getSendreceiveaddress();
+				String[] walletZaddresses = this.clientCaller.getWalletZAddresses();
+
+				boolean bFound = false;
+				for (String address : walletZaddresses)
 				{
-					bFound = true;
+					if (ownZAddress.equals(address))
+					{
+						bFound = true;
+					}
+				}
+
+				if (!bFound)
+				{
+					JOptionPane.showMessageDialog(
+						MessagingPanel.this.getRootPane().getParent(),
+						"The messaging identity send/receive address: \n" +
+						ownZAddress + "\n" +
+						"is not found in the wallet.dat. The reason may be that after a mesaging identity\n" +
+						"was created the wallet.dat was changed or the BTCZ node configuration was changed\n" +
+						"(e.g. mainnet -> testnet). If such a change was made, the messaging identity can no\n" +
+						"longer be used. To avoid this error mesage, you may rename the directory:\n" +
+						OSUtil.getSettingsDirectory() + File.separator + "messaging" + "\n" +
+						"until the configuration or wallet.dat is restored! Directory may only be renamed when\n" +
+						"the wallet is stopped!",
+						"Messaging identity address is not found in walet!", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				this.identityZAddressValidityChecked = true;
+
+			}
+
+
+			// Get the transaction IDs from all received transactions in the local storage
+			// TODO: optimize/cache this
+			Set<String> storedTransactionIDs = new HashSet<String>();
+			for (MessagingIdentity identity : this.messagingStorage.getContactIdentities(true))
+			{
+				for (Message localMessage : this.messagingStorage.getAllMessagesForContact(identity))
+				{
+					if ((localMessage.getDirection() == DIRECTION_TYPE.RECEIVED) &&
+						(!Util.stringIsEmpty(localMessage.getTransactionID())))
+					{
+						storedTransactionIDs.add(localMessage.getTransactionID());
+					}
 				}
 			}
 
-			if (!bFound)
+			if (ownIdentity == null)
 			{
-				JOptionPane.showMessageDialog(
-					MessagingPanel.this.getRootPane().getParent(),
-					"The messaging identity send/receive address: \n" +
-					ownZAddress + "\n" +
-					"is not found in the wallet.dat. The reason may be that after a mesaging identity\n" +
-					"was created the wallet.dat was changed or the BTCZ node configuration was changed\n" +
-					"(e.g. mainnet -> testnet). If such a change was made, the messaging identity can no\n" +
-					"longer be used. To avoid this error mesage, you may rename the directory:\n" +
-					OSUtil.getSettingsDirectory() + File.separator + "messaging" + "\n" +
-					"until the configuration or wallet.dat is restored! Directory may only be renamed when\n" +
-					"the wallet is stopped!",
-					"Messaging identity address is not found in walet!", JOptionPane.ERROR_MESSAGE);
+				Log.warning("Own messaging identity does not exist yet. No received messages collected!");
 				return;
 			}
 
-			this.identityZAddressValidityChecked = true;
-		}
+			String ZAddress = (groupIdentity != null) ?
+			    groupIdentity.getSendreceiveaddress() : ownIdentity.getSendreceiveaddress();
+			// Get all known transactions received from the wallet
+			// TODO: there seems to be no way to limit the number of transactions returned!
+			JsonObject[] walletTransactions = this.clientCaller.getTransactionMessagingDataForZaddress(ZAddress);
 
-		// Get the transaction IDs from all received transactions in the local storage
-		// TODO: optimize/cache this
-		Set<String> storedTransactionIDs = new HashSet<String>();
-		for (MessagingIdentity identity : this.messagingStorage.getContactIdentities(true))
-		{
-			for (Message localMessage : this.messagingStorage.getAllMessagesForContact(identity))
+			// Filter the transactions to obtain only those that have memos parsable as JSON
+			// and being real messages. In addition only those remain that are not registered before
+			List<Message> filteredMessages = new ArrayList<Message>();
+			for (JsonObject trans : walletTransactions)
 			{
-				if ((localMessage.getDirection() == DIRECTION_TYPE.RECEIVED) &&
-					(!Util.stringIsEmpty(localMessage.getTransactionID())))
+				String memoHex = trans.getString("memo", "ERROR");
+				String transactionID = trans.getString("txid",  "ERROR");
+				if (!memoHex.equals("ERROR"))
 				{
-					storedTransactionIDs.add(localMessage.getTransactionID());
-				}
-			}
-		}
-
-		if (ownIdentity == null)
-		{
-			Log.warning("Own messaging identity does not exist yet. No received messages collected!");
-			return;
-		}
-
-		String ZAddress = (groupIdentity != null) ?
-		    groupIdentity.getSendreceiveaddress() : ownIdentity.getSendreceiveaddress();
-		// Get all known transactions received from the wallet
-		// TODO: there seems to be no way to limit the number of transactions returned!
-		JsonObject[] walletTransactions = this.clientCaller.getTransactionMessagingDataForZaddress(ZAddress);
-
-		// Filter the transactions to obtain only those that have memos parsable as JSON
-		// and being real messages. In addition only those remain that are not registered before
-		List<Message> filteredMessages = new ArrayList<Message>();
-		for (JsonObject trans : walletTransactions)
-		{
-			String memoHex = trans.getString("memo", "ERROR");
-			String transactionID = trans.getString("txid",  "ERROR");
-			if (!memoHex.equals("ERROR"))
-			{
-				String decodedMemo = Util.decodeHexMemo(memoHex);
-				JsonObject jsonMessage = null;
-				try
-				{
-					if (decodedMemo != null)
+					String decodedMemo = Util.decodeHexMemo(memoHex);
+					JsonObject jsonMessage = null;
+					try
 					{
-						jsonMessage = Util.parseJsonObject(decodedMemo);
-					}
-				} catch (Exception ex)
-				{
-					Log.warningOneTime(
-						"Decoded memo is not parsable: {0}, due to {1}: {2}",
-						decodedMemo, ex.getClass().getName(), ex.getMessage());
-				}
-
-				if ((jsonMessage != null) &&
-				   ((jsonMessage.get("zenmsg") != null) &&
-				   (!storedTransactionIDs.contains(transactionID))))
-				{
-					JsonObject innerZenmsg = jsonMessage.get("zenmsg").asObject();
-					if (Message.isValidZENMessagingProtocolMessage(innerZenmsg))
+						if (decodedMemo != null)
+						{
+							jsonMessage = Util.parseJsonObject(decodedMemo);
+						}
+					} catch (Exception ex)
 					{
-						// Finally test that the message has all attributes required
-						Message message = new Message(innerZenmsg);
-						// Set additional message attributes not available over the wire
-						message.setDirection(DIRECTION_TYPE.RECEIVED);
-						message.setTransactionID(transactionID);
-						String UNIXDate = this.clientCaller.getWalletTransactionTime(transactionID);
-						message.setTime(new Date(Long.valueOf(UNIXDate).longValue() * 1000L));
-						// TODO: additional sanity check that T/Z addresses are valid etc.
-						filteredMessages.add(message);
-					} else
-					{
-						// Warn of unexpected message content
 						Log.warningOneTime(
-							"Ignoring received mesage with invalid or incomplete content: {0}",
-							jsonMessage.toString());
+							"Decoded memo is not parsable: {0}, due to {1}: {2}",
+							decodedMemo, ex.getClass().getName(), ex.getMessage());
 					}
-				}
-			} // End if (!memoHex.equals("ERROR"))
-		} // for (JsonObject trans : walletTransactions)
 
-		MessagingOptions msgOptions = this.messagingStorage.getMessagingOptions();
+					if ((jsonMessage != null) &&
+					   ((jsonMessage.get("zenmsg") != null) &&
+					   (!storedTransactionIDs.contains(transactionID))))
+					{
+						JsonObject innerZenmsg = jsonMessage.get("zenmsg").asObject();
+						if (Message.isValidZENMessagingProtocolMessage(innerZenmsg))
+						{
+							// Finally test that the message has all attributes required
+							Message message = new Message(innerZenmsg);
+							// Set additional message attributes not available over the wire
+							message.setDirection(DIRECTION_TYPE.RECEIVED);
+							message.setTransactionID(transactionID);
+							String UNIXDate = this.clientCaller.getWalletTransactionTime(transactionID);
+							message.setTime(new Date(Long.valueOf(UNIXDate).longValue() * 1000L));
+							// TODO: additional sanity check that T/Z addresses are valid etc.
+							filteredMessages.add(message);
+						} else
+						{
+							// Warn of unexpected message content
+							Log.warningOneTime(
+								"Ignoring received mesage with invalid or incomplete content: {0}",
+								jsonMessage.toString());
+						}
+					}
+				} // End if (!memoHex.equals("ERROR"))
+			} // for (JsonObject trans : walletTransactions)
 
-		// Finally we have all messages that are new and unprocessed. For every message we find out
-		// who the sender is, verify it and store it
-		boolean bNewContactCreated = false;
+			//MessagingOptions msgOptions = this.messagingStorage.getMessagingOptions();
 
-		// Loop for processing standard (not anonymous messages)
-		standard_message_loop:
-		for (Message message : filteredMessages)
-		{
-			if (message.isAnonymous())
+			// Finally we have all messages that are new and unprocessed. For every message we find out
+			// who the sender is, verify it and store it
+			boolean bNewContactCreated = false;
+
+			// Loop for processing standard (not anonymous messages)
+			standard_message_loop:
+			for (Message message : filteredMessages)
 			{
-				continue standard_message_loop;
-			}
-
-			MessagingIdentity contactID =
-				this.messagingStorage.getContactIdentityForSenderIDAddress(message.getFrom());
-
-			// Check for ignored contact messages
-			if ((groupIdentity == null) && (contactID == null))
-			{
-				MessagingIdentity ignoredContact = this.messagingStorage.getIgnoredContactForMessage(message);
-				if (ignoredContact != null)
+				if (message.isAnonymous())
 				{
-					Log.warningOneTime("Message detected from an ignored contact. Message will be ignored. " +
-				                       "Message: {0}, Ignored contact: {1}",
-				                       message.toJSONObject(false).toString(),
-				                       ignoredContact.toJSONObject(false).toString());
 					continue standard_message_loop;
 				}
-			}
 
-			// Skip message if from an unknown user and options are not set
-			if ((groupIdentity == null) && (contactID == null) &&
-				(!msgOptions.isAutomaticallyAddUsersIfNotExplicitlyImported()))
-			{
-				Log.warningOneTime(
-					"Message is from an unknown user, but options do not allow adding new users: {0}",
-					message.toJSONObject(false).toString());
-				continue standard_message_loop;
-			}
+				MessagingIdentity contactID =
+					this.messagingStorage.getContactIdentityForSenderIDAddress(message.getFrom());
 
-			if ((groupIdentity == null) && (contactID == null))
-			{
-				// Update list of contacts with an unknown remote user ... to be updated later
-				Log.warning("Message is from unknown contact: {0} . " +
-						    "A new Unknown_xxx contact will be created!",
-						    message.toJSONObject(false).toString());
-				contactID = this.messagingStorage.createAndStoreUnknownContactIdentity(message.getFrom());
-			    bNewContactCreated = true;
-			}
-
-			// Verify the message signature
-			if (this.clientCaller.verifyMessage(message.getFrom(), message.getSign(),
-				                                Util.encodeHexString(message.getMessage()).toUpperCase()))
-			{
-				// Handle the special case of a messaging identity sent as payload - update identity then
-				if ((groupIdentity == null) && this.isZENIdentityMessage(message.getMessage()))
+				// Check for ignored contact messages
+				if ((groupIdentity == null) && (contactID == null))
 				{
-					this.updateAndStoreExistingIdentityFromIDMessage(contactID, message.getMessage());
+					MessagingIdentity ignoredContact = this.messagingStorage.getIgnoredContactForMessage(message);
+					if (ignoredContact != null)
+					{
+						Log.warningOneTime("Message detected from an ignored contact. Message will be ignored. " +
+					                       "Message: {0}, Ignored contact: {1}",
+					                       message.toJSONObject(false).toString(),
+					                       ignoredContact.toJSONObject(false).toString());
+						continue standard_message_loop;
+					}
 				}
-				message.setVerification(VERIFICATION_TYPE.VERIFICATION_OK);
-			} else
-			{
-				//Set verification status permanently - store even invalid messages
-				Log.error("Message signature is invalid {0} . Message will be stored as invalid!",
-						   message.toJSONObject(false).toString());
-				message.setVerification(VERIFICATION_TYPE.VERIFICATION_FAILED);
-			}
 
-		    this.messagingStorage.writeNewReceivedMessageForContact(
-		    		(groupIdentity == null) ? contactID : groupIdentity, message);
-		} // End for (Message message : filteredMessages)
-
-		// Loop for processing anonymous messages
-		anonymus_message_loop:
-		for (Message message : filteredMessages)
-		{
-			if (!message.isAnonymous())
-			{
-				continue anonymus_message_loop;
-			}
-
-			// It is possible that it will find a normal identity to which we previously sent the first
-			// anonymous message (send scenario) or maybe an anonymous identity created by incoming
-			// message etc.
-			MessagingIdentity anonContctID = this.messagingStorage.
-				findAnonymousOrNormalContactIdentityByThreadID(message.getThreadID());
-
-			// Check for ignored contact messages
-			if ((groupIdentity == null) && (anonContctID == null))
-			{
-				MessagingIdentity ignoredContact = this.messagingStorage.getIgnoredContactForMessage(message);
-				if (ignoredContact != null)
+				// Skip message if from an unknown user and options are not set
+				if ((groupIdentity == null) && (contactID == null) &&
+					(!msgOptions.isAutomaticallyAddUsersIfNotExplicitlyImported()))
 				{
-					Log.warningOneTime("Message detected from an ignored contact. Message will be ignored. " +
-				                       "Message: {0}, Ignored contact: {1}",
-				                       message.toJSONObject(false).toString(),
-				                       ignoredContact.toJSONObject(false).toString());
+					Log.warningOneTime(
+						"Message is from an unknown user, but options do not allow adding new users: {0}",
+						message.toJSONObject(false).toString());
+					continue standard_message_loop;
+				}
+
+				if ((groupIdentity == null) && (contactID == null))
+				{
+					// Update list of contacts with an unknown remote user ... to be updated later
+					Log.warning("Message is from unknown contact: {0} . " +
+							    "A new Unknown_xxx contact will be created!",
+							    message.toJSONObject(false).toString());
+					contactID = this.messagingStorage.createAndStoreUnknownContactIdentity(message.getFrom());
+				    bNewContactCreated = true;
+				}
+
+				// Verify the message signature
+				if (this.clientCaller.verifyMessage(message.getFrom(), message.getSign(),
+					                                Util.encodeHexString(message.getMessage()).toUpperCase()))
+				{
+					// Handle the special case of a messaging identity sent as payload - update identity then
+					if ((groupIdentity == null) && this.isZENIdentityMessage(message.getMessage()))
+					{
+						this.updateAndStoreExistingIdentityFromIDMessage(contactID, message.getMessage());
+					}
+					message.setVerification(VERIFICATION_TYPE.VERIFICATION_OK);
+				} else
+				{
+					//Set verification status permanently - store even invalid messages
+					Log.error("Message signature is invalid {0} . Message will be stored as invalid!",
+							   message.toJSONObject(false).toString());
+					message.setVerification(VERIFICATION_TYPE.VERIFICATION_FAILED);
+				}
+
+			    this.messagingStorage.writeNewReceivedMessageForContact(
+			    		(groupIdentity == null) ? contactID : groupIdentity, message);
+			} // End for (Message message : filteredMessages)
+
+			// Loop for processing anonymous messages
+			anonymus_message_loop:
+			for (Message message : filteredMessages)
+			{
+				if (!message.isAnonymous())
+				{
 					continue anonymus_message_loop;
 				}
-			}
 
-			// Skip message if from an unknown user and options are not set
-			if ((groupIdentity == null) && (anonContctID == null) &&
-				(!msgOptions.isAutomaticallyAddUsersIfNotExplicitlyImported()))
-			{
-				Log.warningOneTime(
-					"Anonymous message is from an unknown user, but options do not allow adding new users: {0}",
-					message.toJSONObject(false).toString());
-				continue anonymus_message_loop;
-			}
+				// It is possible that it will find a normal identity to which we previously sent the first
+				// anonymous message (send scenario) or maybe an anonymous identity created by incoming
+				// message etc.
+				MessagingIdentity anonContctID = this.messagingStorage.
+					findAnonymousOrNormalContactIdentityByThreadID(message.getThreadID());
 
-			if ((groupIdentity == null) && (anonContctID == null))
-			{
-				// Return address may be empty but we pass it
-				anonContctID = this.messagingStorage.createAndStoreAnonumousContactIdentity(
-					message.getThreadID(), message.getReturnAddress());
-				Log.info("Created new anonymous contact identity: ", anonContctID.toJSONObject(false).toString());
-				bNewContactCreated = true;
-			} else if ((groupIdentity == null) && Util.stringIsEmpty(anonContctID.getSendreceiveaddress()))
-			{
-				if (!Util.stringIsEmpty(message.getReturnAddress()))
+				// Check for ignored contact messages
+				if ((groupIdentity == null) && (anonContctID == null))
 				{
-					anonContctID.setSendreceiveaddress(message.getReturnAddress());
-					this.messagingStorage.updateAnonumousContactIdentityForThreadID(
-						anonContctID.getThreadID(), anonContctID);
-					Log.info("Updated anonymous contact identity: ", anonContctID.toJSONObject(false).toString());
+					MessagingIdentity ignoredContact = this.messagingStorage.getIgnoredContactForMessage(message);
+					if (ignoredContact != null)
+					{
+						Log.warningOneTime("Message detected from an ignored contact. Message will be ignored. " +
+					                       "Message: {0}, Ignored contact: {1}",
+					                       message.toJSONObject(false).toString(),
+					                       ignoredContact.toJSONObject(false).toString());
+						continue anonymus_message_loop;
+					}
 				}
+
+				// Skip message if from an unknown user and options are not set
+				if ((groupIdentity == null) && (anonContctID == null) &&
+					(!msgOptions.isAutomaticallyAddUsersIfNotExplicitlyImported()))
+				{
+					Log.warningOneTime(
+						"Anonymous message is from an unknown user, but options do not allow adding new users: {0}",
+						message.toJSONObject(false).toString());
+					continue anonymus_message_loop;
+				}
+
+				if ((groupIdentity == null) && (anonContctID == null))
+				{
+					// Return address may be empty but we pass it
+					anonContctID = this.messagingStorage.createAndStoreAnonumousContactIdentity(
+						message.getThreadID(), message.getReturnAddress());
+					Log.info("Created new anonymous contact identity: ", anonContctID.toJSONObject(false).toString());
+					bNewContactCreated = true;
+				} else if ((groupIdentity == null) && Util.stringIsEmpty(anonContctID.getSendreceiveaddress()))
+				{
+					if (!Util.stringIsEmpty(message.getReturnAddress()))
+					{
+						anonContctID.setSendreceiveaddress(message.getReturnAddress());
+						this.messagingStorage.updateAnonumousContactIdentityForThreadID(
+							anonContctID.getThreadID(), anonContctID);
+						Log.info("Updated anonymous contact identity: ", anonContctID.toJSONObject(false).toString());
+					}
+				}
+
+				this.messagingStorage.writeNewReceivedMessageForContact(
+					(groupIdentity == null) ? anonContctID : groupIdentity, message);
 			}
 
-			this.messagingStorage.writeNewReceivedMessageForContact(
-				(groupIdentity == null) ? anonContctID : groupIdentity, message);
-		}
+			if (bNewContactCreated)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						try
+						{
+							MessagingPanel.this.contactList.reloadMessagingIdentities();
+						} catch (Exception e)
+						{
+							Log.error("Unexpected error in reloading contacts after gathering messages: ", e);
+							MessagingPanel.this.errorReporter.reportError(e);
+						}
+					}
+				});
+			}
 
-		if (bNewContactCreated)
-		{
+			// TODO: Call this only if anything was changed - e.g. new messages saved
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				@Override
@@ -1775,37 +1800,22 @@ public class MessagingPanel
 				{
 					try
 					{
-						MessagingPanel.this.contactList.reloadMessagingIdentities();
+						// Reload the messages for the currently selected user
+						final MessagingIdentity selectedContact = MessagingPanel.this.contactList.getSelectedContact();
+						if (selectedContact != null)
+						{
+							MessagingPanel.this.displayMessagesForContact(selectedContact);
+						}
 					} catch (Exception e)
 					{
-						Log.error("Unexpected error in reloading contacts after gathering messages: ", e);
+						Log.error("Unexpected error in updating message pane after gathering messages: ", e);
 						MessagingPanel.this.errorReporter.reportError(e);
 					}
 				}
 			});
-		}
 
-		// TODO: Call this only if anything was changed - e.g. new messages saved
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				try
-				{
-					// Reload the messages for the currently selected user
-					final MessagingIdentity selectedContact = MessagingPanel.this.contactList.getSelectedContact();
-					if (selectedContact != null)
-					{
-						MessagingPanel.this.displayMessagesForContact(selectedContact);
-					}
-				} catch (Exception e)
-				{
-					Log.error("Unexpected error in updating message pane after gathering messages: ", e);
-					MessagingPanel.this.errorReporter.reportError(e);
-				}
-			}
-		});
+
+		}
 	}
 
 

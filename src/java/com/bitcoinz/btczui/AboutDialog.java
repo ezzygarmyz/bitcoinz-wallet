@@ -86,7 +86,7 @@ public class AboutDialog extends JDialog{
 			" |____/ | |   | |/ /   / / \\ \\| |  | |\\ | |  / / \\ \\ /\\ / / _` | | |/ _ \\ __| | | || |  \n" +
 			" | ___ \\| |_  | |\\ \\__ \\ \\_/ /| |_ | | \\  | / /_  \\ V  V / (_| | | |  __/ |_| |_| || |  \n" +
 			" |_____/____| |_| \\____|\\___/_____||_|  \\_|/____|  \\_/\\_/ \\__,_|_|_|\\___|\\__|\\___/|___| \n" +
-			"  Version 2.0.7-u2 \n \n"  +
+			"  Version 2.0.7-u3 \n \n"  +
 
 		    " Copyright (c) 2017-2022 BitcoinZ team \n" +
 		    " Copyright (c) 2016-2018 Ivan Vaklinov &lt;ivan@vaklinov.com&gt; \n" +
@@ -115,8 +115,6 @@ public class AboutDialog extends JDialog{
 
 
 
-
-
 		// ************ About Panel start here ****************************
 		// Logo
 		URL iconUrl = this.getClass().getClassLoader().getResource("images/bitcoinz60x60.png");
@@ -130,7 +128,7 @@ public class AboutDialog extends JDialog{
 		aboutNORTH_CENTER.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		aboutNORTH_CENTER.setText(
 				"<html><b><span style='font-weight:bold;font-size:2.3em'>" +
-				"BitcoinZ Wallet UI</span></b><br>&nbsp;Version 2.0.7-u2</html>");
+				"BitcoinZ Wallet UI</span></b><br>&nbsp;Version 2.0.7-u3</html>");
 
 		// About description
 		JLabel aboutCENTER = new JLabel();
@@ -183,6 +181,11 @@ public class AboutDialog extends JDialog{
 				"<html>" +
 					"<div style='display: table; padding: 10px; height: 400px; max-width: 600px; overflow: hidden;'>  " +
 
+						"<b><u>v2.0.7-u3 (MAY-2022)</u></b><br>"+
+						"- Added option to disable the (z) messaging. <br>"+
+						"- Added Raw TX tab with data send capability. <br>"+
+						"- Code tweak and refresh. <br><br>"+
+
 						"<b><u>v2.0.7-u2 (FEB-2022)</u></b><br>"+
 						"- Complete BTCZ'ify of the source code. <br>"+
 						"- Refresh of the About dialog box. <br>"+
@@ -198,8 +201,6 @@ public class AboutDialog extends JDialog{
 						"<b><u>v2.0.7</u></b><br>"+
 						"- BitcoinZ Yoda node update. <br>"+
 
-
-
 					"</div>"+
 				"</html>");
 
@@ -211,15 +212,10 @@ public class AboutDialog extends JDialog{
 		JScrollPane	updatePanel = new JScrollPane(scrollPanel);
 
 
-
-
-
-
 		// ************ System Panel start here ****************************
 		JPanel systemInfoPanel = new JPanel();
 		systemInfoPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		systemInfoPanel.setLayout(new BorderLayout(3, 3));
-
 
 
 
