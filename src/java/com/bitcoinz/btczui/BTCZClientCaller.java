@@ -240,7 +240,7 @@ public class BTCZClientCaller
 	    String strTransactions[][] = new String[jsonTransactions.size()][];
 	    for (int i = 0; i < jsonTransactions.size(); i++)
 	    {
-	    	strTransactions[i] = new String[7];
+	    	strTransactions[i] = new String[8];
 	    	JsonObject trans = jsonTransactions.get(i).asObject();
 
 	    	// Needs to be the same as in getWalletZReceivedTransactions()
@@ -248,45 +248,78 @@ public class BTCZClientCaller
 	    	strTransactions[i][0] = "\u2606T (Public)";
 	    	strTransactions[i][1] = trans.getString("category", "ERROR!");
 	    	strTransactions[i][2] = trans.get("confirmations").toString();
-	    	strTransactions[i][3] = trans.get("amount").toString();
-	    	strTransactions[i][4] = trans.get("time").toString();
-	    	strTransactions[i][5] = trans.getString("address", notListed + " (Z Address not listed by wallet!)");
-	    	strTransactions[i][6] = trans.get("txid").toString();
+				strTransactions[i][3] = " ";
+	    	strTransactions[i][4] = trans.get("amount").toString();
+	    	strTransactions[i][5] = trans.get("time").toString();
+	    	strTransactions[i][6] = trans.getString("address", notListed + " (Z Address not listed by wallet!)");
+	    	strTransactions[i][7] = trans.get("txid").toString();
 
 	    }
 
 	    return strTransactions;
 	}
 
-
-	public synchronized String[] getWalletZAddresses()
+	// Changed to list return to add viewing key
+	public synchronized List<List> getWalletZAddresses()
 		throws WalletCallException, IOException, InterruptedException
 	{
+
+		// Modified for the Viewing key for YODA 2.0.8
+		// TODO : return the VK advice from the cli ?
 		JsonArray jsonAddresses = executeCommandAndGetJsonArray("z_listaddresses", null);
-		String strAddresses[] = new String[jsonAddresses.size()];
+		JsonArray jsonAddressesVK = executeCommandAndGetJsonArray("z_listaddresses", "true");
+		List<String> strAddresses = new ArrayList<String>(); // [jsonAddresses.size()+jsonAddressesVK.size()];
+		List<Boolean> isVKonly = new ArrayList<Boolean>();  //[jsonAddresses.size()+jsonAddressesVK.size()];
+
 		for (int i = 0; i < jsonAddresses.size(); i++)
 		{
-		    strAddresses[i] = jsonAddresses.get(i).asString();
+		    strAddresses.add(jsonAddresses.get(i).asString());
+				isVKonly.add(false);
 		}
 
-	    return strAddresses;
+		// The order of the keys can not be defined (viwing or spending)
+		// Also a secound loop needs to be done to diferiencate it... :-|
+		// TODO: Find a better way or maybe return it from cli directly.
+		for (int i = 0; i < jsonAddressesVK.size(); i++)
+		{
+			if(strAddresses.contains(jsonAddressesVK.get(i).asString()) == false)
+			{
+				strAddresses.add(jsonAddressesVK.get(i).asString());
+				isVKonly.add(true);
+			}
+
+		}
+
+			List<List> retVal = new ArrayList<List>();
+			retVal.add(strAddresses);
+			retVal.add(isVKonly);
+	    return retVal;
 	}
 
 
 	public synchronized String[][] getWalletZReceivedTransactions()
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String[] zAddresses = this.getWalletZAddresses();
+
+		// Modified to get also the Viewing Key
+		List<List> zAdrrData = this.getWalletZAddresses();
+		List<String> zAddresses = zAdrrData.get(0);
+		List<Boolean> isVKsOnly = zAdrrData.get(1);
 
 		List<String[]> zReceivedTransactions = new ArrayList<String[]>();
 
+		int k = 0;
 		for (String zAddress : zAddresses)
 		{
+
+				boolean isVKonly = isVKsOnly.get(k);
+				k++;
+
 		    JsonArray jsonTransactions = executeCommandAndGetJsonArray(
 		    	"z_listreceivedbyaddress", wrapStringParameter(zAddress), "0");
 		    for (int i = 0; i < jsonTransactions.size(); i++)
 		    {
-		    	String[] currentTransaction = new String[7];
+		    	String[] currentTransaction = new String[8];
 		    	JsonObject trans = jsonTransactions.get(i).asObject();
 
 		    	String txID = trans.getString("txid", "ERROR!");
@@ -295,10 +328,11 @@ public class BTCZClientCaller
 		    	currentTransaction[0] = "\u2605Z (Private)";
 		    	currentTransaction[1] = "receive";
 		    	currentTransaction[2] = this.getWalletTransactionConfirmations(txID);
-		    	currentTransaction[3] = trans.get("amount").toString();
-		    	currentTransaction[4] = this.getWalletTransactionTime(txID); // TODO: minimize sub-calls
-		    	currentTransaction[5] = zAddress;
-		    	currentTransaction[6] = trans.get("txid").toString();
+					currentTransaction[3] = isVKonly ? ("vk") : ("");
+		    	currentTransaction[4] = trans.get("amount").toString();
+		    	currentTransaction[5] = this.getWalletTransactionTime(txID); // TODO: minimize sub-calls
+		    	currentTransaction[6] = zAddress;
+		    	currentTransaction[7] = trans.get("txid").toString();
 
 		    	zReceivedTransactions.add(currentTransaction);
 		    }
@@ -1133,6 +1167,20 @@ public class BTCZClientCaller
 				return strResult == null ? "" : strResult.trim();
 			}
 			*/
+			if (!strResult.trim().toLowerCase(Locale.ROOT).contains("error"))
+			{
+				return strResult == null ? "" : strResult.trim();
+			}
+			else throw new WalletCallException("Unexpected response from wallet: " + strResult); // Obviously an error
+		}
+		// The Viewing Key bigin with z : zxviews1qvnx7...
+		else if (first_letter.equals("Z") || first_letter.equals("z"))
+		{
+			String strResult = this.executeCommandAndGetSingleStringResponse(
+				"-rpcclienttimeout=5000", "z_importviewingkey", wrapStringParameter(key));
+
+				// TODO: Give the possibility to rescan. By default the VK do not rescan.
+
 			if (!strResult.trim().toLowerCase(Locale.ROOT).contains("error"))
 			{
 				return strResult == null ? "" : strResult.trim();
